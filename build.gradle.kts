@@ -12,10 +12,7 @@ description = "Freemarker templates for GOV.UK Design System components"
 
 val govukFrontendVersions = mapOf("govukFrontend460" to "v4.6.0", "govukFrontend450" to "v4.5.0")
 
-spotless {
-    ratchetFrom("")
-    java { targetExclude("**/build/generated/**") }
-}
+spotless { java { targetExclude("**/build/generated/**") } }
 
 sourceSets {
     govukFrontendVersions.forEach { (version, tagName) ->
