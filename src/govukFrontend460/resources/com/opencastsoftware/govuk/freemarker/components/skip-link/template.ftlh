@@ -1,0 +1,1 @@
+<a href="${params.href!"#content"}" class="govuk-skip-link<#if (params.classes)??> ${params.classes}</#if>"<#list params.attributes as attribute, value> ${attribute}="${value}"</#list> data-module="govuk-skip-link">${((params.html)??)?then(params.html?no_esc, params.text)}</a>

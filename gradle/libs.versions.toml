@@ -1,0 +1,39 @@
+[versions]
+apacheCommonsLang = "3.12.0"
+apacheCommonsText = "1.10.0"
+equalsVerifier = "3.14.1"
+freemarker = "2.3.32"
+gradleNode = "4.0.0"
+gradleJavaConventions = "0.1.3"
+grgit = "5.2.0"
+hamcrest = "2.2"
+jacoco = "0.8.8"
+javaPoet = "1.13.0"
+jqwik = "1.7.3"
+json = "20230227"
+jsoup = "1.16.1"
+jsr305 = "3.0.2"
+junit = "5.9.3"
+snakeYaml = "2.0"
+toStringVerifier = "1.4.8"
+
+[libraries]
+apacheCommonsLang = { module = "org.apache.commons:commons-lang3", version.ref = "apacheCommonsLang" }
+apacheCommonsText = { module = "org.apache.commons:commons-text", version.ref = "apacheCommonsText" }
+equalsVerifier = { module = "nl.jqno.equalsverifier:equalsverifier", version.ref = "equalsVerifier" }
+freemarker = { module = "org.freemarker:freemarker", version.ref = "freemarker" }
+hamcrest = { module = "org.hamcrest:hamcrest", version.ref = "hamcrest" }
+javaPoet = { module = "com.squareup:javapoet", version.ref = "javaPoet" }
+jqwik = { module = "net.jqwik:jqwik", version.ref = "jqwik" }
+json = { module = "org.json:json", version.ref = "json" }
+jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
+jsr305 = { module = "com.google.code.findbugs:jsr305", version.ref = "jsr305" }
+junitJupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
+toStringVerifier = { module = "com.jparams:to-string-verifier", version.ref = "toStringVerifier" }
+gradleNodePlugin = { module = "com.github.node-gradle:gradle-node-plugin", version.ref = "gradleNode" }
+grgitCore = { module = "org.ajoberstar.grgit:grgit-core", version.ref = "grgit" }
+grgitGradle = { module = "org.ajoberstar.grgit:grgit-gradle", version.ref = "grgit" }
+snakeYaml = { module = "org.yaml:snakeyaml", version.ref = "snakeYaml" }
+
+[plugins]
+gradleJavaConventions = { id = "com.opencastsoftware.gradle.java-conventions", version.ref = "gradleJavaConventions" }
