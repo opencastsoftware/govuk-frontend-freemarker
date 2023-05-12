@@ -9,7 +9,7 @@ These templates have been translated from the original [Nunjucks](https://mozill
 
 ## Installation
 
-*govuk-frontend-freemarker* is published for Java 8 and above.
+*govuk-frontend-freemarker* is published for Java 11 and above.
 
 Gradle (build.gradle / build.gradle.kts):
 
