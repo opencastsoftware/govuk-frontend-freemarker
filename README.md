@@ -91,6 +91,33 @@ var writer = new StringWriter();
 template.process(Params.of(accordion), writer);
 ```
 
+## Contributing
+
+This project is built with [Gradle](https://gradle.org/install/) 8.x and requires a [Java 11+ JDK](https://adoptium.net/temurin/releases/?version=11).
+
+### Prerequisites
+
+In order to run integration tests, this project makes use of a Node app, [govuk-nunjucks-renderer](https://github.com/opencastsoftware/govuk-nunjucks-renderer/).
+
+It's a web app which renders Nunjucks templates via a HTTP API, in order to enable comparative testing with a diverse range of technology stacks.
+
+To run it:
+
+```bash
+# Docker
+docker run -d -p 3000:3000 ghcr.io/opencastsoftware/govuk-nunjucks-renderer:0.1.0 
+# Podman
+podman run -d -p 3000:3000 ghcr.io/opencastsoftware/govuk-nunjucks-renderer:0.1.0 
+```
+
+### Building
+
+To build and run tests:
+
+```bash
+./gradlew build --info
+```
+
 ## Acknowlegements
 
 This project wouldn't exist without the work of the GOV.UK Design System and GOV.UK Frontend contributors.
