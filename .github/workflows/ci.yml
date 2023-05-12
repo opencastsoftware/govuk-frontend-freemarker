@@ -11,6 +11,7 @@ env:
   ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.PGP_PASSPHRASE }}
 
 permissions:
+  contents: read
   packages: read
 
 jobs:
