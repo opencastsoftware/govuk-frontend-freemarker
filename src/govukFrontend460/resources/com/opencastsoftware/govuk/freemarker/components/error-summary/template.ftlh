@@ -1,5 +1,5 @@
 <#assign caller><#nested/></#assign caller>
-<div class="govuk-error-summary<#if (params.classes)??> ${params.classes}</#if>"<#if params.disableAutoFocus> data-disable-auto-focus="${(params.disableAutoFocus?c)}"</#if><#list params.attributes as attribute, value> ${attribute}="${value}"</#list> data-module="govuk-error-summary">
+<div class="govuk-error-summary<#if (params.classes)??> ${params.classes}</#if>"<#if (params.disableAutoFocus)?? && params.disableAutoFocus> data-disable-auto-focus="${(params.disableAutoFocus?c)}"</#if><#list params.attributes as attribute, value> ${attribute}="${value}"</#list> data-module="govuk-error-summary">
   
   <div role="alert">
     <h2 class="govuk-error-summary__title">

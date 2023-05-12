@@ -18,7 +18,7 @@
 </svg>
   </#assign>
   <#assign classNames=classNames + " govuk-button--start">
-</#if><#assign commonAttributes> class="${classNames}" data-module="govuk-button"<#list params.attributes as attribute, value> ${attribute}="${value}"</#list><#if (params.id)??> id="${params.id}"</#if></#assign><#assign buttonAttributes><#if (params.name)??> name="${params.name}"</#if><#if params.disabled> disabled="disabled" aria-disabled="true"</#if><#if params.preventDoubleClick> data-prevent-double-click="${(params.preventDoubleClick?c)}"</#if></#assign><#if (element == "a")??>
+</#if><#assign commonAttributes> class="${classNames}" data-module="govuk-button"<#list params.attributes as attribute, value> ${attribute}="${value}"</#list><#if (params.id)??> id="${params.id}"</#if></#assign><#assign buttonAttributes><#if (params.name)??> name="${params.name}"</#if><#if params.disabled> disabled="disabled" aria-disabled="true"</#if><#if (params.preventDoubleClick)?? && params.preventDoubleClick> data-prevent-double-click="${(params.preventDoubleClick?c)}"</#if></#assign><#if (element == "a")??>
 <a href="${((params.href)??)?then(params.href, "#")}" role="button" draggable="false"${commonAttributes?markup_string?no_esc}>
   ${((params.html)??)?then(params.html?no_esc, params.text)}
 ${((iconHtml)??)?then(iconHtml?markup_string?no_esc?trim, "")}</a><#elseif (element == "button")??>
