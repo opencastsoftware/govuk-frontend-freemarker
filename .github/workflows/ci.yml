@@ -68,6 +68,3 @@ jobs:
         image: ghcr.io/opencastsoftware/govuk-nunjucks-renderer:0.1.0
         ports:
           - 3000:3000
-        credentials:
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
