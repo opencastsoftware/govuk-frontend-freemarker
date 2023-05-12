@@ -10,6 +10,9 @@ env:
   ORG_GRADLE_PROJECT_signingKey: ${{ secrets.PGP_SECRET }}
   ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.PGP_PASSPHRASE }}
 
+permissions:
+  packages: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -59,3 +62,12 @@ jobs:
         uses: gradle/gradle-build-action@v2.4.2
         with:
           arguments: publishAllPublicationsToMavenCentral
+
+    services:
+      nunjucks-renderer:
+        image: ghcr.io/opencastsoftware/govuk-nunjucks-renderer:0.1.0
+        ports:
+          - 3000:3000
+        credentials:
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
