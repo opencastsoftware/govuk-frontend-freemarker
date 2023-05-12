@@ -69,5 +69,5 @@ jobs:
         ports:
           - 3000:3000
         credentials:
-          username: ${{ github.actor }}
-          password: ${{ github.token }}
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
