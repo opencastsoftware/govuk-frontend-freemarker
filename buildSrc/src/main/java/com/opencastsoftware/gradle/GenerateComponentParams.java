@@ -68,6 +68,10 @@ public abstract class GenerateComponentParams extends DefaultTask {
     }
 
     private void generateGetter(TypeSpec.Builder typeSpec, ParameterSchema param, FieldSpec fieldSpec) {
+        generateGetter(typeSpec, param, fieldSpec, true);
+    }
+
+    private void generateGetter(TypeSpec.Builder typeSpec, ParameterSchema param, FieldSpec fieldSpec, boolean withAnnotations) {
         var methodName = IS_PATTERN.matcher(param.getName()).find()
                 ? param.getName()
                 : "get" + WordUtils.capitalize(param.getName());
@@ -76,10 +80,12 @@ public abstract class GenerateComponentParams extends DefaultTask {
                 .returns(fieldSpec.type)
                 .addStatement("return this.$N", fieldSpec.name);
 
-        if (param.isRequired()) {
-            method.addAnnotation(Nonnull.class);
-        } else {
-            method.addAnnotation(Nullable.class);
+        if (withAnnotations) {
+            if (param.isRequired()) {
+                method.addAnnotation(Nonnull.class);
+            } else {
+                method.addAnnotation(Nullable.class);
+            }
         }
 
         typeSpec.addMethod(method.build());
@@ -105,6 +111,21 @@ public abstract class GenerateComponentParams extends DefaultTask {
         typeSpec.addMethod(method.build());
     }
 
+    private void generateWither(TypeSpec.Builder typeSpec, ParameterSchema param, FieldSpec fieldSpec, ClassName builderName) {
+        var methodName = "with" + WordUtils.capitalize(param.getName().replaceFirst("^is", ""));
+
+        var methodParam = ParameterSpec.builder(fieldSpec.type, fieldSpec.name);
+
+        var method = MethodSpec.methodBuilder(methodName)
+                .addModifiers(Modifier.PUBLIC)
+                .returns(builderName)
+                .addParameter(methodParam.build())
+                .addStatement("this.$N = $N", fieldSpec.name, fieldSpec.name)
+                .addStatement("return this");
+
+        typeSpec.addMethod(method.build());
+    }
+
     private String sanitizeParamName(String name) {
         return "for".equals(name) ? "htmlFor" : name;
     }
@@ -119,12 +140,18 @@ public abstract class GenerateComponentParams extends DefaultTask {
     }
 
     private FieldSpec generateField(TypeSpec.Builder typeSpec, String componentName, ParameterSchema param) {
+       return generateField(typeSpec, componentName, param, true);
+    }
+
+    private FieldSpec generateField(TypeSpec.Builder typeSpec, String componentName, ParameterSchema param, boolean withAnnotations) {
         var fieldName = sanitizeParamName(param.getName());
         var fieldBuilder = FieldSpec.builder(getTypeName(componentName, param), fieldName, Modifier.PRIVATE);
-        if (param.isRequired()) {
-            fieldBuilder.addAnnotation(Nonnull.class);
-        } else {
-            fieldBuilder.addAnnotation(Nullable.class);
+        if (withAnnotations) {
+            if (param.isRequired()) {
+                fieldBuilder.addAnnotation(Nonnull.class);
+            } else {
+                fieldBuilder.addAnnotation(Nullable.class);
+            }
         }
         var fieldSpec = fieldBuilder.build();
         typeSpec.addField(fieldSpec);
@@ -192,6 +219,44 @@ public abstract class GenerateComponentParams extends DefaultTask {
         typeSpec.addMethod(constructor.build());
     }
 
+    private void generateBuilder(TypeSpec.Builder typeSpec, String componentName, ClassName className, List<ParameterSchema> params) throws IOException {
+        var builderName = ClassName.get(className.packageName(), className.simpleName(), "Builder");
+        var builder = TypeSpec.classBuilder(builderName)
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
+
+        var buildArgs = new Object[params.size() + 1];
+        buildArgs[0] = className;
+
+        for (var i = 0 ; i < params.size() ; i++) {
+            var param = params.get(i);
+            var fieldSpec = generateField(builder, componentName, param, false);
+            generateGetter(builder, param, fieldSpec, false);
+            generateWither(builder, param, fieldSpec, builderName);
+            buildArgs[i + 1] = fieldSpec;
+        }
+
+        var argStrings = new String[params.size()];
+        Arrays.fill(argStrings, "$N");
+
+        var argFormatString = String.join(", ", argStrings);
+
+        builder.addMethod(MethodSpec.methodBuilder("build")
+                .addModifiers(Modifier.PUBLIC)
+                .returns(className)
+                .addStatement("return new $T(" + argFormatString + ")", buildArgs)
+                .build());
+
+        var builderSpec = builder.build();
+
+        typeSpec.addType(builderSpec);
+
+        typeSpec.addMethod(MethodSpec.methodBuilder("builder")
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .returns(builderName)
+                .addStatement("return new $T()", builderName)
+                .build());
+    }
+
     private void generateModelClass(List<ParameterSchema> params, String componentName, ClassName className) throws IOException {
         var outDir = getGeneratedSourcesDir().get().getAsFile();
 
@@ -202,6 +267,8 @@ public abstract class GenerateComponentParams extends DefaultTask {
         for (var param : params) {
             generateParam(typeBuilder, componentName, param);
         }
+
+        generateBuilder(typeBuilder, componentName, className, params);
 
         var typeSpec = typeBuilder.build();
 

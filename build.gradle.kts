@@ -12,7 +12,26 @@ description = "Freemarker templates for GOV.UK Design System components"
 
 val govukFrontendVersions = mapOf("govukFrontend460" to "v4.6.0", "govukFrontend450" to "v4.5.0")
 
-spotless { java { targetExclude("**/build/generated/**") } }
+spotless {
+    java {
+        clearSteps()
+        targetExclude("**/build/generated/**")
+        licenseHeader(
+            """
+            /*
+             * SPDX-FileCopyrightText:  © ${"$"}YEAR Opencast Software Europe Ltd <https://opencastsoftware.com>
+             * SPDX-License-Identifier: MIT
+             */
+            """
+                .trimIndent()
+        )
+        removeUnusedImports()
+        importOrder("", "javax", "java", "\\#")
+        indentWithSpaces()
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+}
 
 sourceSets {
     govukFrontendVersions.forEach { (version, tagName) ->
@@ -51,10 +70,9 @@ mavenPublishing {
         url.set("https://github.com/opencastsoftware/govuk-frontend-freemarker")
         inceptionYear.set("2023")
         licenses {
-            // TODO: Change this to MIT
             license {
-                name.set("The Apache License, Version 2.0")
-                url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                name.set("The MIT License")
+                url.set("https://opensource.org/license/mit/")
                 distribution.set("repo")
             }
         }

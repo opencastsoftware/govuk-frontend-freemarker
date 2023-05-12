@@ -1,6 +1,6 @@
 /*
  * SPDX-FileCopyrightText:  © 2023 Opencast Software Europe Ltd <https://opencastsoftware.com>
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-License-Identifier: MIT
  */
 package com.opencastsoftware.govuk.freemarker;
 
@@ -72,12 +72,20 @@ public class AccordionTest {
         var input = new JSONObject();
         input.put("id", "bla");
         input.put("items", new JSONArray());
+
         var nunjucksDoc = Jsoup.parseBodyFragment(renderNunjucks(input).body());
 
         var stringWriter = new StringWriter();
         try (var bufWriter = new BufferedWriter(stringWriter)) {
-            template.process(Params.of(new Accordion("bla", null, null, null, null, null, null, null, null, null, null, Collections.emptyList())), bufWriter);
+            var accordion = Accordion.builder()
+                    .withId("bla")
+                    .withItems(Collections.emptyList())
+                    .build();
+
+            template.process(Params.of(accordion), bufWriter);
+
             var freemarkerDoc = Jsoup.parseBodyFragment(stringWriter.toString());
+
             assertTrue(nunjucksDoc.hasSameValue(freemarkerDoc));
         }
     }
