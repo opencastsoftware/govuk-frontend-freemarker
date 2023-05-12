@@ -7,7 +7,9 @@ on:
       - completed
 
 permissions:
+  actions: read
   checks: write
+  pull-requests: read
 
 jobs:
   report:
