@@ -61,6 +61,11 @@ java {
     }
 }
 
+tasks.withType<JavaCompile> {
+    // Target Java 11
+    options.release.set(11)
+}
+
 mavenPublishing {
     coordinates("com.opencastsoftware", "govuk-frontend-freemarker", project.version.toString())
 
