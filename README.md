@@ -54,7 +54,7 @@ config.setFallbackOnNullLoopVariable(false);
 
 Please note the invocation of `setClassForTemplateLoading`. The templates will be resolved relative to the class and package prefix used in this call.
 
-### Get a Template instance
+### Get a Template instance
 
 Template names reflect the structure used in [govuk-frontend](), so each component possesses:
 
@@ -65,7 +65,7 @@ Template names reflect the structure used in [govuk-frontend](), so each compone
 var template = config.getTemplate("accordion/template.ftlh");
 ```
 
-### Populate the data model
+### Populate the data model
 
 Each data model class has a `Builder` class which enables you to build up the parameters of the template incrementally.
 
@@ -78,7 +78,7 @@ var accordion = Accordion.builder()
   .build()
 ```
 
-### Render the template
+### Render the template
 
 Every template accepts a top-level `Params` object containing the data model.
 
