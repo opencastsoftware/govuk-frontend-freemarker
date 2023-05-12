@@ -12,5 +12,5 @@
   <#assign describedBy=((describedBy)??)?then(describedBy + " " + errorId, errorId)>
   ${errorMessage.govukErrorMessage({ "id": errorId, "classes": params.errorMessage.classes, "attributes": params.errorMessage.attributes, "html": params.errorMessage.html, "text": params.errorMessage.text, "visuallyHiddenText": params.errorMessage.visuallyHiddenText })?trim}
 </#if>
-  <input class="govuk-file-upload<#if (params.classes)??> ${params.classes}</#if><#if (params.errorMessage)??> govuk-file-upload--error</#if>" id="${params.id}" name="${params.name}" type="file"<#if (params.value)??> value="${params.value}"</#if><#if (describedBy)??> aria-describedby="${describedBy}"</#if><#list params.attributes as attribute, value> ${attribute}="${value}"</#list>>
+  <input class="govuk-file-upload<#if (params.classes)??> ${params.classes}</#if><#if (params.errorMessage)??> govuk-file-upload--error</#if>" id="${params.id}" name="${params.name}" type="file"<#if (params.value)??> value="${params.value}"</#if><#if (describedBy)??> aria-describedby="${describedBy}"</#if><#list params.attributes!{} as attribute, value> ${attribute}="${value}"</#list>>
 </div>

@@ -17,8 +17,8 @@
   <#assign describedBy=((describedBy)??)?then(describedBy + " " + errorId, errorId)>
   ${errorMessage.govukErrorMessage({ "id": errorId, "classes": params.errorMessage.classes, "attributes": params.errorMessage.attributes, "html": params.errorMessage.html, "text": params.errorMessage.text, "visuallyHiddenText": params.errorMessage.visuallyHiddenText })?trim}
 </#if>
-  <div class="govuk-date-input<#if (params.classes)??> ${params.classes}</#if>"<#list params.attributes as attribute, value> ${attribute}="${value}"</#list><#if (params.id)??> id="${params.id}"</#if>>
-    <#list dateInputItems as item>
+  <div class="govuk-date-input<#if (params.classes)??> ${params.classes}</#if>"<#list params.attributes!{} as attribute, value> ${attribute}="${value}"</#list><#if (params.id)??> id="${params.id}"</#if>>
+    <#list dateInputItems![] as item>
     <div class="govuk-date-input__item">
       ${input.govukInput({ "label": { "text": ((item.label)??)?then(item.label, item.name?capitalize), "classes": "govuk-date-input__label" }, "id": ((item.id)??)?then(item.id, (params.id + "-" + item.name)), "classes": "govuk-date-input__input " + (((item.classes)??)?then(item.classes, "")), "name": ((params.namePrefix)??)?then((params.namePrefix + "-" + item.name), item.name), "value": item.value, "type": "text", "inputmode": ((item.inputmode)??)?then(item.inputmode, "numeric"), "autocomplete": item.autocomplete, "pattern": item.pattern, "attributes": item.attributes })?trim}
     </div>

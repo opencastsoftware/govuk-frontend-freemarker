@@ -11,7 +11,7 @@
   <#assign describedBy=((describedBy)??)?then(describedBy + " " + errorId, errorId)>
   ${errorMessage.govukErrorMessage({ "id": errorId, "classes": params.errorMessage.classes, "attributes": params.errorMessage.attributes, "html": params.errorMessage.html, "text": params.errorMessage.text, "visuallyHiddenText": params.errorMessage.visuallyHiddenText })?trim}
 </#if>
-  <div class="govuk-radios<#if (params.classes)??> ${params.classes}</#if>"<#list params.attributes as attribute, value> ${attribute}="${value}"</#list>
+  <div class="govuk-radios<#if (params.classes)??> ${params.classes}</#if>"<#list params.attributes!{} as attribute, value> ${attribute}="${value}"</#list>
     data-module="govuk-radios">
     <#list params.items as item>
       <#if (item)??><#if (item.id)??><#assign id=item.id><#else><#if (item?is_first)??><#assign id=idPrefix>
@@ -21,7 +21,7 @@
         <#assign hasHint=((item.hint.text)?? || (item.hint.html)??)?then(true, "")>
         <#assign itemHintId=id + "-item-hint">
         <div class="govuk-radios__item">
-          <input class="govuk-radios__input" id="${id}" name="${params.name}" type="radio" value="${item.value}"${((isChecked)??)?then(" checked", "")}${(item.disabled)?then(" disabled", "")}<#if (item.conditional.html)??> data-aria-controls="${conditionalId}"</#if><#if (hasHint)??> aria-describedby="${itemHintId}"</#if><#list item.attributes as attribute, value> ${attribute}="${value}"</#list>>
+          <input class="govuk-radios__input" id="${id}" name="${params.name}" type="radio" value="${item.value}"${((isChecked)??)?then(" checked", "")}${(item.disabled)?then(" disabled", "")}<#if (item.conditional.html)??> data-aria-controls="${conditionalId}"</#if><#if (hasHint)??> aria-describedby="${itemHintId}"</#if><#list item.attributes!{} as attribute, value> ${attribute}="${value}"</#list>>
           ${label.govukLabel({ "html": item.html, "text": item.text, "classes": "govuk-radios__label" + (((item.label.classes)??)?then(" " + item.label.classes, "")), "attributes": item.label.attributes, "for": id })?trim}
           <#if (hasHint)??>
           ${hint.govukHint({ "id": itemHintId, "classes": "govuk-radios__hint" + (((item.hint.classes)??)?then(" " + item.hint.classes, "")), "attributes": item.hint.attributes, "html": item.hint.html, "text": item.hint.text })?trim}

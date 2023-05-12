@@ -1,8 +1,8 @@
-<footer class="govuk-footer ${((params.classes)??)?then(params.classes, "")}" role="contentinfo"<#list params.attributes as attribute, value> ${attribute}="${value}"</#list>>
+<footer class="govuk-footer ${((params.classes)??)?then(params.classes, "")}" role="contentinfo"<#list params.attributes!{} as attribute, value> ${attribute}="${value}"</#list>>
   <div class="govuk-width-container ${((params.containerClasses)??)?then(params.containerClasses, "")}">
     <#if (params.navigation?size)??>
       <div class="govuk-footer__navigation">
-        <#list params.navigation as nav>
+        <#list params.navigation![] as nav>
           <div class="govuk-footer__section govuk-grid-column-${nav.width!"full"}">
             <h2 class="govuk-footer__heading govuk-heading-m">${nav.title}</h2>
             <#if (nav.items?size)??>
@@ -12,10 +12,10 @@
                 </#if>
               </#assign>
               <ul class="govuk-footer__list ${listClasses?markup_string?trim}">
-                <#list nav.items as item>
+                <#list nav.items![] as item>
                   <#if (item.href)?? && (item.text)??>
                     <li class="govuk-footer__list-item">
-                      <a class="govuk-footer__link" href="${item.href}"<#list item.attributes as attribute, value> ${attribute}="${value}"</#list>>
+                      <a class="govuk-footer__link" href="${item.href}"<#list item.attributes![] as attribute, value> ${attribute}="${value}"</#list>>
                         ${item.text}
                       </a>
                     </li>
@@ -34,9 +34,9 @@
           <h2 class="govuk-visually-hidden">${params.meta.visuallyHiddenTitle!"Support links"}</h2>
           <#if (params.meta.items?size)??>
             <ul class="govuk-footer__inline-list">
-              <#list params.meta.items as item>
+              <#list params.meta.items![] as item>
                 <li class="govuk-footer__inline-list-item">
-                  <a class="govuk-footer__link" href="${item.href}"<#list item.attributes as attribute, value> ${attribute}="${value}"</#list>>
+                  <a class="govuk-footer__link" href="${item.href}"<#list item.attributes!{} as attribute, value> ${attribute}="${value}"</#list>>
                     ${item.text}
                   </a>
                 </li>

@@ -1,6 +1,6 @@
 <#assign menuButtonText=((params.menuButtonText)??)?then(params.menuButtonText, "Menu")>
 
-<header class="govuk-header ${((params.classes)??)?then(params.classes, "")}" role="banner" data-module="govuk-header"<#list params.attributes as attribute, value> ${attribute}="${value}"</#list>>
+<header class="govuk-header ${((params.classes)??)?then(params.classes, "")}" role="banner" data-module="govuk-header"<#list params.attributes!{} as attribute, value> ${attribute}="${value}"</#list>>
   <div class="govuk-header__container ${params.containerClasses!"govuk-width-container"}">
     <div class="govuk-header__logo">
       <a href="${params.homepageUrl!"/"}" class="govuk-header__link govuk-header__link--homepage">
@@ -53,11 +53,11 @@
       <button type="button" class="govuk-header__menu-button govuk-js-header-toggle" aria-controls="navigation" aria-label="${params.menuButtonLabel!"Show or hide menu"}" hidden>${menuButtonText}</button>
 
       <ul id="navigation" class="govuk-header__navigation-list">
-        <#list params.navigation as item>
+        <#list params.navigation![] as item>
           <#if (item.text)?? || (item.html)??>
             <li class="govuk-header__navigation-item${(item.active)?then(" govuk-header__navigation-item--active", "")}">
               <#if (item.href)??>
-                <a class="govuk-header__link" href="${item.href}"<#list item.attributes as attribute, value> ${attribute}="${value}"</#list>>
+                <a class="govuk-header__link" href="${item.href}"<#list item.attributes!{} as attribute, value> ${attribute}="${value}"</#list>>
               </#if>
                 ${((item.html)??)?then(item.html?no_esc, item.text)}
               <#if (item.href)??>

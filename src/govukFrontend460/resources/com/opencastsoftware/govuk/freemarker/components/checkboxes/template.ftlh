@@ -14,7 +14,7 @@
   <#assign describedBy=((describedBy)??)?then(describedBy + " " + errorId, errorId)>
   ${errorMessage.govukErrorMessage({ "id": errorId, "classes": params.errorMessage.classes, "attributes": params.errorMessage.attributes, "html": params.errorMessage.html, "text": params.errorMessage.text, "visuallyHiddenText": params.errorMessage.visuallyHiddenText })?trim}
 </#if>
-  <div class="govuk-checkboxes<#if (params.classes)??> ${params.classes}</#if>"<#list params.attributes as attribute, value> ${attribute}="${value}"</#list>
+  <div class="govuk-checkboxes<#if (params.classes)??> ${params.classes}</#if>"<#list params.attributes!{} as attribute, value> ${attribute}="${value}"</#list>
     data-module="govuk-checkboxes">
     <#list params.items as item>
       <#if (item)??><#if (item.id)??><#assign id=item.id><#else><#if (item?is_first)??><#assign id=idPrefix>
@@ -27,7 +27,7 @@
           <#assign itemDescribedBy=((!hasFieldset)??)?then(describedBy, "")>
           <#assign itemDescribedBy=(itemDescribedBy + " " + itemHintId)?trim>
           <div class="govuk-checkboxes__item">
-            <input class="govuk-checkboxes__input" id="${id}" name="${name}" type="checkbox" value="${item.value}"${((isChecked)??)?then(" checked", "")}${(item.disabled)?then(" disabled", "")}<#if (item.conditional.html)??> data-aria-controls="${conditionalId}"</#if><#if (item.behaviour)??> data-behaviour="${item.behaviour}"</#if><#if (itemDescribedBy)??> aria-describedby="${itemDescribedBy}"</#if><#list item.attributes as attribute, value> ${attribute}="${value}"</#list>>
+            <input class="govuk-checkboxes__input" id="${id}" name="${name}" type="checkbox" value="${item.value}"${((isChecked)??)?then(" checked", "")}${(item.disabled)?then(" disabled", "")}<#if (item.conditional.html)??> data-aria-controls="${conditionalId}"</#if><#if (item.behaviour)??> data-behaviour="${item.behaviour}"</#if><#if (itemDescribedBy)??> aria-describedby="${itemDescribedBy}"</#if><#list item.attributes!{} as attribute, value> ${attribute}="${value}"</#list>>
             ${label.govukLabel({ "html": item.html, "text": item.text, "classes": "govuk-checkboxes__label" + (((item.label.classes)??)?then(" " + item.label.classes, "")), "attributes": item.label.attributes, "for": id })?trim}
             <#if (hasHint)??>
             ${hint.govukHint({ "id": itemHintId, "classes": "govuk-checkboxes__hint" + (((item.hint.classes)??)?then(" " + item.hint.classes, "")), "attributes": item.hint.attributes, "html": item.hint.html, "text": item.hint.text })?trim}

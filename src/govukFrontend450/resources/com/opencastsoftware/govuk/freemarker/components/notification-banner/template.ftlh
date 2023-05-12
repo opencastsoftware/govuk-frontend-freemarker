@@ -19,7 +19,7 @@
   <#assign title="Success"><#else>
   <#assign title="Important"></#if><div class="govuk-notification-banner<#if (typeClass)??> ${typeClass}</#if><#if (params.classes)??> ${params.classes}</#if>" role="${role}"
   aria-labelledby="${params.titleId!"govuk-notification-banner-title"}"
-  data-module="govuk-notification-banner"<#if (params.disableAutoFocus)?? && params.disableAutoFocus> data-disable-auto-focus="${(params.disableAutoFocus?c)}"</#if><#list params.attributes as attribute, value> ${attribute}="${value}"</#list>>
+  data-module="govuk-notification-banner"<#if (params.disableAutoFocus)?? && params.disableAutoFocus> data-disable-auto-focus="${(params.disableAutoFocus?c)}"</#if><#list params.attributes!{} as attribute, value> ${attribute}="${value}"</#list>>
   <div class="govuk-notification-banner__header">
     <h${params.titleHeadingLevel!2} class="govuk-notification-banner__title" id="${params.titleId!"govuk-notification-banner-title"}" >
       ${title}
