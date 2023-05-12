@@ -3,6 +3,7 @@ import org.gradle.configurationcache.extensions.capitalized
 
 plugins {
     `java-library`
+    `jacoco-report-aggregation`
     alias(libs.plugins.gradleJavaConventions)
 }
 
@@ -142,5 +143,6 @@ testing {
 tasks.check {
     govukFrontendVersions.forEach { (version, _) ->
         dependsOn(testing.suites.named("test${version.capitalized()}"))
+        finalizedBy(tasks["test${version.capitalized()}CodeCoverageReport"])
     }
 }
