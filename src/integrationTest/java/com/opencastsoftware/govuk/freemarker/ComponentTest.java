@@ -4,11 +4,12 @@
  */
 package com.opencastsoftware.govuk.freemarker;
 
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
-import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
@@ -28,6 +29,7 @@ public abstract class ComponentTest<A> {
     protected final Configuration config;
     protected final Template template;
     protected final HttpClient http = HttpClient.newHttpClient();
+    protected final ObjectMapper objectMapper = new ObjectMapper();
 
     protected Configuration templateConfiguration() {
         return new Configuration(Configuration.VERSION_2_3_32);
@@ -46,6 +48,7 @@ public abstract class ComponentTest<A> {
     public ComponentTest(String componentName) throws IOException {
         this.componentName = componentName;
         this.config = templateConfiguration();
+        this.objectMapper.setSerializationInclusion(Include.NON_NULL);
         config.setClassForTemplateLoading(AccordionTest.class, "components");
         config.setDefaultEncoding(StandardCharsets.UTF_8.name());
         config.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
@@ -55,11 +58,12 @@ public abstract class ComponentTest<A> {
         this.template = config.getTemplate(this.componentName + "/template.ftlh");
     }
 
-    protected Document renderNunjucks(JSONObject input) throws IOException, InterruptedException {
-        var params = new JSONObject();
-        params.put("params", input);
+    protected Document renderNunjucks(A dataModel) throws IOException, InterruptedException {
+        var params = Params.of(dataModel);
 
-        var postBody = HttpRequest.BodyPublishers.ofString(params.toString());
+        var paramsJson = objectMapper.writeValueAsString(params);
+
+        var postBody = HttpRequest.BodyPublishers.ofString(paramsJson);
 
         var response = http.send(
                 requestBuilder().POST(postBody).build(),
@@ -67,7 +71,7 @@ public abstract class ComponentTest<A> {
         );
 
         if (response.statusCode() != 200) {
-            fail("Failed to render Nunjucks template: " + response.body());
+            fail("Failed to render Nunjucks template:\n\n" + response.body() + "\n\n" + "Using params:\n\n" + paramsJson);
         }
 
         return Jsoup.parseBodyFragment(response.body());

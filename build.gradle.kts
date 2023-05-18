@@ -1,4 +1,5 @@
 import com.opencastsoftware.gradle.GenerateComponentParams
+import com.opencastsoftware.gradle.GenerateParamGenerators
 import org.gradle.configurationcache.extensions.capitalized
 
 plugins {
@@ -48,8 +49,31 @@ sourceSets {
             tasks[compileJavaTaskName].dependsOn(generateParamsTask.get())
             java { srcDirs(generatedSrcDir) }
             dependencies {
-                "${version}Implementation"(sourceSets["main"].output)
                 "${version}Implementation"(libs.jsr305)
+                "${version}Implementation"(sourceSets["main"].output)
+            }
+        }
+
+        val generateGeneratorsTaskName = "generate${version.capitalized()}Generators"
+        val generatedTestSrcDir = "${buildDir}/generated/${version}Generators/java"
+        val generatedTestResourceDir = "${buildDir}/generated/${version}Generators/resources"
+        val generateGeneratorsTask =
+            tasks.register<GenerateParamGenerators>(generateGeneratorsTaskName) {
+                govukFrontendTagName.set(tagName)
+                generatedSourcesDir.set(file(generatedTestSrcDir))
+                generatedResourcesDir.set(file(generatedTestResourceDir))
+            }
+
+        sourceSets.create("${version}Generators") {
+            tasks[compileJavaTaskName].dependsOn(generateGeneratorsTask.get())
+            tasks[processResourcesTaskName].dependsOn(generateGeneratorsTask.get())
+            java { srcDirs(generatedTestSrcDir) }
+            resources { srcDirs(generatedTestResourceDir) }
+            dependencies {
+                "${version}GeneratorsImplementation"(libs.jsr305)
+                "${version}GeneratorsImplementation"(sourceSets["main"].output)
+                "${version}GeneratorsImplementation"(sourceSets[version].output)
+                "${version}GeneratorsImplementation"(libs.jqwik)
             }
         }
     }
@@ -124,11 +148,13 @@ testing {
                 dependencies {
                     implementation(libs.freemarker)
                     implementation(libs.junitJupiter)
+                    implementation(libs.jqwik)
                     implementation(libs.hamcrest)
-                    implementation(libs.json)
+                    implementation(libs.jacksonDataBind)
                     implementation(libs.jsoup)
                     implementation(sourceSets["main"].output)
                     implementation(sourceSets[version].output)
+                    implementation(sourceSets["${version}Generators"].output)
                 }
                 targets {
                     all {

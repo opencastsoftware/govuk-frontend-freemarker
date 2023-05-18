@@ -9,8 +9,8 @@ grgit = "5.2.0"
 hamcrest = "2.2"
 jacoco = "0.8.8"
 javaPoet = "1.13.0"
+jackson = "2.15.1"
 jqwik = "1.7.3"
-json = "20230227"
 jsoup = "1.16.1"
 jsr305 = "3.0.2"
 junit = "5.9.3"
@@ -23,9 +23,9 @@ apacheCommonsText = { module = "org.apache.commons:commons-text", version.ref = 
 equalsVerifier = { module = "nl.jqno.equalsverifier:equalsverifier", version.ref = "equalsVerifier" }
 freemarker = { module = "org.freemarker:freemarker", version.ref = "freemarker" }
 hamcrest = { module = "org.hamcrest:hamcrest", version.ref = "hamcrest" }
+jacksonDataBind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
 javaPoet = { module = "com.squareup:javapoet", version.ref = "javaPoet" }
 jqwik = { module = "net.jqwik:jqwik", version.ref = "jqwik" }
-json = { module = "org.json:json", version.ref = "json" }
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
 jsr305 = { module = "com.google.code.findbugs:jsr305", version.ref = "jsr305" }
 junitJupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
