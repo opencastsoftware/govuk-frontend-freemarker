@@ -3,7 +3,8 @@ package com.opencastsoftware.gradle;
 import com.squareup.javapoet.*;
 import org.apache.commons.lang3.stream.Streams;
 import org.apache.commons.text.WordUtils;
-import org.gradle.api.file.RegularFileProperty;
+import org.gradle.api.file.DirectoryProperty;
+import org.gradle.api.tasks.InputDirectory;
 import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.TaskAction;
 
@@ -19,21 +20,19 @@ import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
-public abstract class GenerateComponentParams extends GovukComponentAwareTask {
+public abstract class GenerateModelClasses extends GovukComponentTask {
+    @InputDirectory
+    abstract public DirectoryProperty getRepositoryDir();
+
     @OutputDirectory
-    abstract public RegularFileProperty getGeneratedSourcesDir();
-
-    private final Pattern IS_PATTERN = Pattern.compile("^is[A-Z]");
-
+    abstract public DirectoryProperty getGeneratedSourcesDir();
 
     private void generateGetter(TypeSpec.Builder typeSpec, ParameterSchema param, FieldSpec fieldSpec) {
         generateGetter(typeSpec, param, fieldSpec, true);
     }
 
     private void generateGetter(TypeSpec.Builder typeSpec, ParameterSchema param, FieldSpec fieldSpec, boolean withAnnotations) {
-        var methodName = IS_PATTERN.matcher(param.getName()).find()
-                ? param.getName()
-                : "get" + WordUtils.capitalize(param.getName());
+        var methodName = "get" + WordUtils.capitalize(param.getName());
         var method = MethodSpec.methodBuilder(methodName)
                 .addModifiers(Modifier.PUBLIC)
                 .returns(fieldSpec.type)
@@ -51,7 +50,7 @@ public abstract class GenerateComponentParams extends GovukComponentAwareTask {
     }
 
     private void generateSetter(TypeSpec.Builder typeSpec, ParameterSchema param, FieldSpec fieldSpec) {
-        var methodName = "set" + WordUtils.capitalize(param.getName().replaceFirst("^is", ""));
+        var methodName = "set" + WordUtils.capitalize(param.getName());
 
         var methodParam = ParameterSpec.builder(fieldSpec.type, fieldSpec.name);
 
@@ -71,7 +70,7 @@ public abstract class GenerateComponentParams extends GovukComponentAwareTask {
     }
 
     private void generateWither(TypeSpec.Builder typeSpec, ParameterSchema param, FieldSpec fieldSpec, ClassName builderName) {
-        var methodName = "with" + WordUtils.capitalize(param.getName().replaceFirst("^is", ""));
+        var methodName = "with" + WordUtils.capitalize(param.getName());
 
         var methodParam = ParameterSpec.builder(fieldSpec.type, fieldSpec.name);
 
@@ -186,10 +185,37 @@ public abstract class GenerateComponentParams extends GovukComponentAwareTask {
                 .build());
     }
 
+    private void generateToString(TypeSpec.Builder typeSpec, List<ParameterSchema> params, String componentName) {
+        var className = ClassName.get(MODEL_PACKAGE, componentName);
+
+        var method = MethodSpec.methodBuilder("toString")
+                .returns(ClassName.get(String.class))
+                .addAnnotation(Override.class)
+                .addModifiers(Modifier.PUBLIC);
+
+        var methodCode = CodeBlock.builder();
+
+        var newline = System.lineSeparator();
+
+        methodCode.add("return $S" + newline, className.simpleName() + "[");
+
+        for (int i = 0; i < params.size(); i++) {
+            var paramName = params.get(i).getName();
+            var paramPrefix = i == 0 ? paramName + "=" : ", " + paramName + "=";
+            methodCode.add(" + $S + $N" + newline, paramPrefix, sanitizeParamName(paramName));
+        }
+
+        methodCode.add(" + $S", "]");
+
+        method.addStatement(methodCode.build());
+
+        typeSpec.addMethod(method.build());
+    }
+
     private void generateModelClass(List<ParameterSchema> params, String componentName) throws IOException {
         var className = ClassName.get(MODEL_PACKAGE, componentName);
 
-        var outDir = getGeneratedSourcesDir().get().getAsFile();
+        var srcDir = getGeneratedSourcesDir().get().getAsFile();
 
         var typeBuilder = TypeSpec.classBuilder(className).addModifiers(Modifier.PUBLIC, Modifier.FINAL);
 
@@ -199,31 +225,30 @@ public abstract class GenerateComponentParams extends GovukComponentAwareTask {
             generateParam(typeBuilder, componentName, param);
         }
 
+        generateToString(typeBuilder, params, componentName);
+
         generateBuilder(typeBuilder, className, params);
 
         var typeSpec = typeBuilder.build();
 
         var paramsFile = JavaFile.builder(MODEL_PACKAGE, typeSpec).build();
 
-        paramsFile.writeTo(outDir);
+        paramsFile.writeTo(srcDir);
     }
 
     private void generateModelClass(Path schemaPath) throws IOException {
         try (var input = new FileInputStream(schemaPath.toFile())) {
             var componentDir = schemaPath.getParent().getFileName().toString();
-            var rawSchema = yaml.<ComponentSchema>load(input);
-            var preparedSchema = preProcessSchema(rawSchema);
-            generateModelClass(preparedSchema.getParams(), kebabCaseToCamelCase(componentDir));
+            var componentSchema = yaml.<ComponentSchema>load(input);
+            preProcessSchema(componentSchema);
+            generateModelClass(componentSchema.getParams(), kebabCaseToCamelCase(componentDir));
         }
     }
 
     @TaskAction
     public void generate() throws IOException {
-        var tmpDir = getTemporaryDir();
-
-        cloneRepo(tmpDir);
-
-        var componentsPath = tmpDir.toPath().resolve("src").resolve("govuk").resolve("components");
+        var componentsPath = getRepositoryDir().getAsFile().get().toPath()
+                .resolve("src").resolve("govuk").resolve("components");
 
         try (var files = Files.find(componentsPath, Integer.MAX_VALUE, this::isParameterSchema)) {
             Streams.stream(files).forEach(this::generateModelClass);

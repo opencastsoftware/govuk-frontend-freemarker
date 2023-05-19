@@ -1,5 +1,7 @@
-import com.opencastsoftware.gradle.GenerateComponentParams
-import com.opencastsoftware.gradle.GenerateParamGenerators
+import com.opencastsoftware.gradle.CloneGovukFrontend
+import com.opencastsoftware.gradle.GenerateIntegrationTests
+import com.opencastsoftware.gradle.GenerateModelClasses
+import com.opencastsoftware.gradle.GenerateModelGenerators
 import org.gradle.configurationcache.extensions.capitalized
 
 plugins {
@@ -11,8 +13,6 @@ plugins {
 group = "com.opencastsoftware"
 
 description = "Freemarker templates for GOV.UK Design System components"
-
-val govukFrontendVersions = mapOf("govukFrontend460" to "v4.6.0", "govukFrontend450" to "v4.5.0")
 
 spotless {
     java {
@@ -35,60 +35,125 @@ spotless {
     }
 }
 
-sourceSets {
-    govukFrontendVersions.forEach { (version, tagName) ->
+java { toolchain.languageVersion.set(JavaLanguageVersion.of(11)) }
+
+tasks.withType<JavaCompile> {
+    // Target Java 11
+    options.release.set(11)
+}
+
+testing {
+    suites {
+        val test by
+            getting(JvmTestSuite::class) {
+                dependencies {
+                    implementation(libs.junitJupiter)
+                    implementation(libs.hamcrest)
+                    implementation(libs.jqwik)
+                    implementation(libs.freemarker)
+                    implementation(libs.jacksonDataBind)
+                    implementation(libs.xmlUnitLegacy)
+                    implementation(libs.xmlUnitMatchers)
+                }
+            }
+
+    }
+}
+
+val govukFrontendVersions = mapOf("govukFrontend460" to "v4.6.0", "govukFrontend450" to "v4.5.0")
+
+govukFrontendVersions.forEach { (version, tagName) ->
+    val cloneRepoDir = "${buildDir}/generated/${version}/gitRepo"
+    val cloneRepoTaskName = "clone${version.capitalized()}"
+    val cloneRepoTask =
+        tasks.register<CloneGovukFrontend>(cloneRepoTaskName) {
+            govukFrontendTagName.set(tagName)
+            repositoryDir.set(file(cloneRepoDir))
+        }
+
+    sourceSets {
         val generatedSrcDir = "${buildDir}/generated/${version}/java"
-        val generateParamsTaskName = "generate${version.capitalized()}Params"
-        val generateParamsTask =
-            tasks.register<GenerateComponentParams>(generateParamsTaskName) {
-                govukFrontendTagName.set(tagName)
+        val generateModelClassesTaskName = "generate${version.capitalized()}Models"
+        val generateModelClassesTask =
+            tasks.register<GenerateModelClasses>(generateModelClassesTaskName) {
+                repositoryDir.set(cloneRepoTask.map { it.repositoryDir.get() })
                 generatedSourcesDir.set(file(generatedSrcDir))
             }
 
         sourceSets.create(version) {
-            tasks[compileJavaTaskName].dependsOn(generateParamsTask.get())
+            tasks[compileJavaTaskName].dependsOn(generateModelClassesTask.get())
             java { srcDirs(generatedSrcDir) }
             dependencies {
                 "${version}Implementation"(libs.jsr305)
                 "${version}Implementation"(sourceSets["main"].output)
             }
         }
+    }
 
-        val generateGeneratorsTaskName = "generate${version.capitalized()}Generators"
-        val generatedTestSrcDir = "${buildDir}/generated/${version}Generators/java"
-        val generatedTestResourceDir = "${buildDir}/generated/${version}Generators/resources"
-        val generateGeneratorsTask =
-            tasks.register<GenerateParamGenerators>(generateGeneratorsTaskName) {
-                govukFrontendTagName.set(tagName)
-                generatedSourcesDir.set(file(generatedTestSrcDir))
-                generatedResourcesDir.set(file(generatedTestResourceDir))
-            }
+    java { registerFeature(version) { usingSourceSet(sourceSets[version]) } }
 
-        sourceSets.create("${version}Generators") {
-            tasks[compileJavaTaskName].dependsOn(generateGeneratorsTask.get())
-            tasks[processResourcesTaskName].dependsOn(generateGeneratorsTask.get())
-            java { srcDirs(generatedTestSrcDir) }
-            resources { srcDirs(generatedTestResourceDir) }
-            dependencies {
-                "${version}GeneratorsImplementation"(libs.jsr305)
-                "${version}GeneratorsImplementation"(sourceSets["main"].output)
-                "${version}GeneratorsImplementation"(sourceSets[version].output)
-                "${version}GeneratorsImplementation"(libs.jqwik)
+    val suiteName = "test${version.capitalized()}"
+
+    testing {
+        suites {
+            register<JvmTestSuite>(suiteName) {
+                val generatedTestSrcDir = "${buildDir}/generated/${suiteName}/java"
+
+                val generateModelGeneratorsTaskName = "generate${version.capitalized()}Generators"
+                val generatedTestResourceDir = "${buildDir}/generated/${suiteName}/resources"
+                val generateModelGeneratorsTask =
+                    tasks.register<GenerateModelGenerators>(generateModelGeneratorsTaskName) {
+                        repositoryDir.set(cloneRepoTask.map { it.repositoryDir.get() })
+                        generatedSourcesDir.set(file(generatedTestSrcDir))
+                        generatedResourcesDir.set(file(generatedTestResourceDir))
+                    }
+
+                val generateIntegrationTestsTaskName = "generate${version.capitalized()}Tests"
+                val generateIntegrationTestsTask =
+                    tasks.register<GenerateIntegrationTests>(generateIntegrationTestsTaskName) {
+                        repositoryDir.set(cloneRepoTask.map { it.repositoryDir.get() })
+                        generatedTestsDir.set(file(generatedTestSrcDir))
+                    }
+
+                sources {
+                    java {
+                        tasks[compileJavaTaskName].dependsOn(generateModelGeneratorsTask.get())
+                        tasks[compileJavaTaskName].dependsOn(generateIntegrationTestsTask.get())
+                        tasks[processResourcesTaskName].dependsOn(generateModelGeneratorsTask.get())
+                        setSrcDirs(listOf(generatedTestSrcDir))
+                    }
+
+                    resources { srcDir(generatedTestResourceDir) }
+                }
+
+                dependencies {
+                    implementation(sourceSets["main"].output)
+                    implementation(sourceSets["test"].output)
+                    implementation(sourceSets[version].output)
+                    implementation(libs.junitJupiter)
+                    implementation(libs.hamcrest)
+                    implementation(libs.jqwik)
+                    implementation(libs.freemarker)
+                    implementation(libs.jacksonDataBind)
+                    implementation(libs.xmlUnitLegacy)
+                    implementation(libs.xmlUnitMatchers)
+                    implementation(libs.jsr305)
+                    implementation(libs.apacheCommonsText)
+                }
+
+                targets {
+                    all {
+                        testTask.configure { systemProperty("govuk.version", tagName.substring(1)) }
+                    }
+                }
             }
         }
     }
-}
 
-java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(11))
-    govukFrontendVersions.forEach { (version, _) ->
-        registerFeature(version) { usingSourceSet(sourceSets[version]) }
+    tasks.check {
+        dependsOn(testing.suites.named(suiteName))
+        finalizedBy(tasks["${suiteName}CodeCoverageReport"])
     }
-}
-
-tasks.withType<JavaCompile> {
-    // Target Java 11
-    options.release.set(11)
 }
 
 mavenPublishing {
@@ -137,38 +202,5 @@ mavenPublishing {
             )
             url.set("https://github.com/opencastsoftware/govuk-frontend-freemarker")
         }
-    }
-}
-
-testing {
-    suites {
-        govukFrontendVersions.forEach { (version, tagName) ->
-            register<JvmTestSuite>("test${version.capitalized()}") {
-                sources { java { srcDir("${projectDir}/src/integrationTest/java") } }
-                dependencies {
-                    implementation(libs.freemarker)
-                    implementation(libs.junitJupiter)
-                    implementation(libs.jqwik)
-                    implementation(libs.hamcrest)
-                    implementation(libs.jacksonDataBind)
-                    implementation(libs.jsoup)
-                    implementation(sourceSets["main"].output)
-                    implementation(sourceSets[version].output)
-                    implementation(sourceSets["${version}Generators"].output)
-                }
-                targets {
-                    all {
-                        testTask.configure { systemProperty("govuk.version", tagName.substring(1)) }
-                    }
-                }
-            }
-        }
-    }
-}
-
-tasks.check {
-    govukFrontendVersions.forEach { (version, _) ->
-        dependsOn(testing.suites.named("test${version.capitalized()}"))
-        finalizedBy(tasks["test${version.capitalized()}CodeCoverageReport"])
     }
 }

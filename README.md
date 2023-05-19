@@ -48,15 +48,24 @@ config.setClassForTemplateLoading(Params.class, "components");
 config.setDefaultEncoding(StandardCharsets.UTF_8.name());
 config.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
 config.setLogTemplateExceptions(false);
-config.setWrapUncheckedExceptions(false);
+config.setWrapUncheckedExceptions(true);
 config.setFallbackOnNullLoopVariable(false);
 ```
 
-Please note the invocation of `setClassForTemplateLoading`. The templates will be resolved relative to the class and package prefix used in this call.
+Please note the invocation of `setClassForTemplateLoading`. Templates will be resolved relative to the class and package prefix used in this call.
+
+In addition, we will set the FreeMarker `boolean_format` and `number_format` settings to `"c"`, the setting for computers.
+
+```java
+config.setBooleanFormat("c");
+config.setNumberFormat("c");
+```
+
+This is because Nunjucks does not have any special formatting behaviour for numbers or booleans.
 
 ### Get a Template instance
 
-Template names reflect the structure used in [govuk-frontend](), so each component possesses:
+Template names reflect the structure used in [govuk-frontend](https://github.com/alphagov/govuk-frontend), so each component possesses:
 
 * a `macro.ftlh` file - containing the interface for rendering the component within other templates
 * a `template.ftlh` file - containing the template content

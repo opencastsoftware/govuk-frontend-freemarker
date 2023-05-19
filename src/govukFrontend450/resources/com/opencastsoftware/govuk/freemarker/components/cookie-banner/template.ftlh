@@ -1,18 +1,18 @@
-<#import "../button/macro.ftlh" as button><div class="govuk-cookie-banner ${((params.classes)??)?then(params.classes, "")}" data-nosnippet role="region" aria-label="${params.ariaLabel!"Cookie banner"}"<#if params.hidden> hidden</#if><#list params.attributes!{} as attribute, value> ${attribute}="${value}"</#list>><#list params.messages as message>
+<#import "../button/macro.ftlh" as button><div class="govuk-cookie-banner ${((params.classes)?has_content)?then(params.classes, "")}" data-nosnippet role="region" aria-label="${params.ariaLabel!"Cookie banner"}"<#if (params.hidden)?? && params.hidden> hidden</#if><#list params.attributes!{} as attribute, value> ${attribute}="${value}"</#list>><#list params.messages as message>
     <#assign classNames="govuk-cookie-banner__message govuk-width-container">
-    <#if (message.classes)??>
+    <#if (message.classes)?has_content>
       <#assign classNames=classNames + " " + message.classes>
     </#if>
 
-    <div class="${classNames}"<#if (message.role)??> role="${message.role}"</#if><#list message.attributes!{} as attribute, value> ${attribute}="${value}"</#list><#if message.hidden> hidden</#if>>
+    <div class="${classNames}"<#if (message.role)?has_content> role="${message.role}"</#if><#list message.attributes!{} as attribute, value> ${attribute}="${value}"</#list><#if (message.hidden)?? && message.hidden> hidden</#if>>
 
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-two-thirds">
-        <#if (message.headingHtml)?? || (message.headingText)??>
-        <h2 class="govuk-cookie-banner__heading govuk-heading-m"><#if (message.headingHtml)??>${message.headingHtml?no_esc}<#else>${message.headingText}</#if></h2>
+        <#if (message.headingHtml)?has_content || (message.headingText)?has_content>
+        <h2 class="govuk-cookie-banner__heading govuk-heading-m"><#if (message.headingHtml)?has_content>${message.headingHtml?no_esc}<#else>${message.headingText}</#if></h2>
         </#if>
 
-        <div class="govuk-cookie-banner__content"><#if (message.html)??>${message.html?no_esc}<#elseif (message.text)??><p class="govuk-body">${message.text}</p></#if></div>
+        <div class="govuk-cookie-banner__content"><#if (message.html)?has_content>${message.html?no_esc}<#elseif (message.text)?has_content><p class="govuk-body">${message.text}</p></#if></div>
       </div>
     </div>
 

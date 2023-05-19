@@ -10,8 +10,14 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
+import org.custommonkey.xmlunit.HTMLDocumentBuilder;
+import org.custommonkey.xmlunit.TolerantSaxDocumentBuilder;
+import org.custommonkey.xmlunit.XMLUnit;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.ParserConfigurationException;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -30,6 +36,9 @@ public abstract class ComponentTest<A> {
     protected final Template template;
     protected final HttpClient http = HttpClient.newHttpClient();
     protected final ObjectMapper objectMapper = new ObjectMapper();
+    protected final DocumentBuilder docBuilder = XMLUnit.newControlParser();
+    protected final TolerantSaxDocumentBuilder saxBuilder = new TolerantSaxDocumentBuilder(docBuilder);
+    protected final HTMLDocumentBuilder htmlBuilder = new HTMLDocumentBuilder(saxBuilder);
 
     protected Configuration templateConfiguration() {
         return new Configuration(Configuration.VERSION_2_3_32);
@@ -45,20 +54,22 @@ public abstract class ComponentTest<A> {
                 .uri(URI.create("http://localhost:3000/govuk/" + System.getProperty("govuk.version") + "/components/" + this.componentName));
     }
 
-    public ComponentTest(String componentName) throws IOException {
+    public ComponentTest(String componentName) throws IOException, ParserConfigurationException {
         this.componentName = componentName;
         this.config = templateConfiguration();
         this.objectMapper.setSerializationInclusion(Include.NON_NULL);
-        config.setClassForTemplateLoading(AccordionTest.class, "components");
+        config.setClassForTemplateLoading(Params.class, "components");
         config.setDefaultEncoding(StandardCharsets.UTF_8.name());
         config.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
         config.setLogTemplateExceptions(false);
         config.setWrapUncheckedExceptions(false);
         config.setFallbackOnNullLoopVariable(false);
+        config.setNumberFormat("c");
+        config.setBooleanFormat("c");
         this.template = config.getTemplate(this.componentName + "/template.ftlh");
     }
 
-    protected Document renderNunjucks(A dataModel) throws IOException, InterruptedException {
+    protected Document renderNunjucks(A dataModel) throws IOException, InterruptedException, SAXException {
         var params = Params.of(dataModel);
 
         var paramsJson = objectMapper.writeValueAsString(params);
@@ -74,16 +85,16 @@ public abstract class ComponentTest<A> {
             fail("Failed to render Nunjucks template:\n\n" + response.body() + "\n\n" + "Using params:\n\n" + paramsJson);
         }
 
-        return Jsoup.parseBodyFragment(response.body());
+        return htmlBuilder.parse(response.body());
     }
 
-    protected Document renderFreeMarker(A dataModel) throws TemplateException, IOException {
+    protected Document renderFreeMarker(A dataModel) throws TemplateException, IOException, SAXException {
         var stringWriter = new StringWriter();
 
         try (var bufWriter = new BufferedWriter(stringWriter)) {
             template.process(Params.of(dataModel), bufWriter);
         }
 
-        return Jsoup.parseBodyFragment(stringWriter.toString());
+        return htmlBuilder.parse(stringWriter.toString());
     }
 }

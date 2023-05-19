@@ -6,7 +6,7 @@
     <#function _actionLink action>
       <#assign result><@_actionLinkMacro action=action/></#assign>
       <#return result>
-    </#function><#macro _summaryCardMacro params><#assign headingLevel=((params.title.headingLevel)??)?then(params.title.headingLevel, 2)><div class="govuk-summary-card<#if (params.classes)??> ${params.classes}</#if>"<#list params.attributes!{} as attribute, value> ${attribute}="${value}"</#list>>
+    </#function><#macro _summaryCardMacro params><#assign headingLevel=((params.title.headingLevel)??)?then(params.title.headingLevel, 2)><div class="govuk-summary-card<#if (params.classes)?has_content> ${params.classes}</#if>"<#list params.attributes!{} as attribute, value> ${attribute}="${value}"</#list>>
     <div class="govuk-summary-card__title-wrapper"><#if (params.title)??><h${headingLevel} class="govuk-summary-card__title<#if (params.title.classes)??> ${params.title.classes}</#if>">${((params.title.html)??)?then(params.title.html?no_esc, params.title.text)}</h${headingLevel}></#if><#if (params.actions.items.length)??><#if (params.actions.items.length == 1)??><div class="govuk-summary-card__actions<#if (params.actions.classes)??> ${params.actions.classes}</#if>">${_actionLink(params.actions.items.0)}</div><#else><ul class="govuk-summary-card__actions<#if (params.actions.classes)??> ${params.actions.classes}</#if>"><#list params.actions.items![] as action><li class="govuk-summary-card__action">${_actionLink(action)}</li></#list></ul>
         </#if></#if></div>
 
@@ -21,18 +21,18 @@
 <#list params.rows as row>
   <#assign anyRowHasActions=((row.actions.items?size)??)?then(true, anyRowHasActions)>
 </#list><#assign summaryList>
-  <dl class="govuk-summary-list<#if (params.classes)??> ${params.classes}</#if>"<#list params.attributes!{} as attribute, value> ${attribute}="${value}"</#list>>
+  <dl class="govuk-summary-list<#if (params.classes)?has_content> ${params.classes}</#if>"<#list params.attributes!{} as attribute, value> ${attribute}="${value}"</#list>>
     <#list params.rows as row>
       <#if (row)??>
-        <div class="govuk-summary-list__row<#if (anyRowHasActions)?? && (!row.actions.items)??> govuk-summary-list__row--no-actions</#if><#if (row.classes)??> ${row.classes}</#if>">
-          <dt class="govuk-summary-list__key<#if (row.key.classes)??> ${row.key.classes}</#if>">
-            ${((row.key.html)??)?then(row.key.html?no_esc, row.key.text)}
+        <div class="govuk-summary-list__row<#if (anyRowHasActions)?? && (!row.actions.items)??> govuk-summary-list__row--no-actions</#if><#if (row.classes)?has_content> ${row.classes}</#if>">
+          <dt class="govuk-summary-list__key<#if (row.key.classes)?has_content> ${row.key.classes}</#if>">
+            ${((row.key.html)?has_content)?then(row.key.html?no_esc, row.key.text)}
           </dt>
-          <dd class="govuk-summary-list__value<#if (row.value.classes)??> ${row.value.classes}</#if>">
-            ${((row.value.html)??)?then(row.value.html?trim?no_esc, row.value.text)}
+          <dd class="govuk-summary-list__value<#if (row.value.classes)?has_content> ${row.value.classes}</#if>">
+            ${((row.value.html)?has_content)?then(row.value.html?trim?no_esc, row.value.text)}
           </dd>
           <#if (row.actions.items.length)??>
-            <dd class="govuk-summary-list__actions<#if (row.actions.classes)??> ${row.actions.classes}</#if>">
+            <dd class="govuk-summary-list__actions<#if (row.actions.classes)?has_content> ${row.actions.classes}</#if>">
               <#if (row.actions.items.length == 1)??>
                 ${_actionLink(row.actions.items.0)?trim}
               <#else>

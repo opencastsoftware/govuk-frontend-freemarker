@@ -1,11 +1,11 @@
 <#assign caller><#nested/></#assign caller>
-<details<#if (params.id)??> id="${params.id}"</#if> class="govuk-details<#if (params.classes)??> ${params.classes}</#if>" data-module="govuk-details"<#list params.attributes!{} as attribute, value> ${attribute}="${value}"</#list>${(params.open)?then(" open", "")}>
+<details<#if (params.id)?has_content> id="${params.id}"</#if> class="govuk-details<#if (params.classes)?has_content> ${params.classes}</#if>" data-module="govuk-details"<#list params.attributes!{} as attribute, value> ${attribute}="${value}"</#list>${((params.open)?? && params.open)?then(" open", "")}>
   <summary class="govuk-details__summary">
     <span class="govuk-details__summary-text">
-      ${((params.summaryHtml)??)?then(params.summaryHtml?no_esc, params.summaryText)}
+      ${((params.summaryHtml)?has_content)?then(params.summaryHtml?no_esc, params.summaryText)}
     </span>
   </summary>
   <div class="govuk-details__text">
-    ${((caller)??)?then(caller, (((params.html)??)?then(params.html?no_esc, params.text)))}
+    ${((caller)??)?then(caller, (((params.html)?has_content)?then(params.html?no_esc, params.text)))}
   </div>
 </details>

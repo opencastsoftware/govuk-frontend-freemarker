@@ -1,12 +1,12 @@
 <#assign caller><#nested/></#assign caller>
-<#assign headingLevel=((params.headingLevel)??)?then(params.headingLevel, 1)>
-<div class="govuk-panel govuk-panel--confirmation<#if (params.classes)??> ${params.classes}</#if>"<#list params.attributes!{} as attribute, value> ${attribute}="${value}"</#list>>
+<#assign headingLevel=((params.headingLevel != 0) && (!params.headingLevel?is_nan))?then(params.headingLevel, 1)>
+<div class="govuk-panel govuk-panel--confirmation<#if (params.classes)?has_content> ${params.classes}</#if>"<#list params.attributes!{} as attribute, value> ${attribute}="${value}"</#list>>
   <h${headingLevel} class="govuk-panel__title">
-    ${((params.titleHtml)??)?then(params.titleHtml?no_esc, params.titleText)}
+    ${((params.titleHtml)?has_content)?then(params.titleHtml?no_esc, params.titleText)}
   </h${headingLevel}>
-  <#if (caller)?? || (params.html)?? || (params.text)??>
+  <#if (caller)?? || (params.html)?has_content || (params.text)?has_content>
   <div class="govuk-panel__body">
-    ${((caller)??)?then(caller, (((params.html)??)?then(params.html?no_esc, params.text)))}
+    ${((caller)??)?then(caller, (((params.html)?has_content)?then(params.html?no_esc, params.text)))}
   </div>
   </#if>
 </div>

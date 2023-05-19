@@ -14,27 +14,21 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.representer.Representer;
 
-import java.io.File;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public abstract class GovukComponentAwareTask extends DefaultTask {
-    @Input
-    public abstract Property<String> getGovukFrontendTagName();
-
+public abstract class GovukComponentTask extends DefaultTask {
     protected final Yaml yaml;
 
     private final char[] CASE_DELIMITERS = new char[]{'-'};
 
     protected final String MODEL_PACKAGE = "com.opencastsoftware.govuk.freemarker";
 
-    public GovukComponentAwareTask() {
+    public GovukComponentTask() {
         var representer = new Representer(new DumperOptions());
         representer.getPropertyUtils().setSkipMissingProperties(true);
         this.yaml = new Yaml(new Constructor(ComponentSchema.class, new LoaderOptions()), representer);
@@ -90,21 +84,6 @@ public abstract class GovukComponentAwareTask extends DefaultTask {
         return filename.endsWith(".yaml") && attrs.isRegularFile();
     }
 
-    protected void cloneRepo(File tmpDir) {
-        var gitDir = tmpDir.toPath().resolve(".git");
-        var tagName = getGovukFrontendTagName().get();
-        var githubToken = System.getenv("GITHUB_TOKEN");
-        var repoUrl = githubToken != null && !githubToken.isBlank() ? "https://oauth2:" + githubToken + "@github.com/alphagov/govuk-frontend" : "https://github.com/alphagov/govuk-frontend";
-
-        if (!Files.exists(gitDir)) {
-            getProject().exec(cmd -> {
-                cmd.setExecutable("git");
-                cmd.setArgs(Arrays.asList("clone", "--depth", "1", "-b", tagName, repoUrl, "."));
-                cmd.setWorkingDir(tmpDir);
-            });
-        }
-    }
-
     protected List<ParameterSchema> preProcessParamSchemas(List<ParameterSchema> params) {
         if (params.isEmpty()) {
             return params;
@@ -155,7 +134,7 @@ public abstract class GovukComponentAwareTask extends DefaultTask {
                 }).collect(Collectors.toList());
     }
 
-    protected ComponentSchema preProcessSchema(ComponentSchema schema) {
-        return new ComponentSchema(preProcessParamSchemas(schema.getParams()));
+    protected void preProcessSchema(ComponentSchema schema) {
+        schema.setParams(preProcessParamSchemas(schema.getParams()));
     }
 }

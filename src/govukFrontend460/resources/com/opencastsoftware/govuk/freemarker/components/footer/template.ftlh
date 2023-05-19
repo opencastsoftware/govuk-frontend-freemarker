@@ -1,5 +1,5 @@
-<footer class="govuk-footer ${((params.classes)??)?then(params.classes, "")}" role="contentinfo"<#list params.attributes!{} as attribute, value> ${attribute}="${value}"</#list>>
-  <div class="govuk-width-container ${((params.containerClasses)??)?then(params.containerClasses, "")}">
+<footer class="govuk-footer ${((params.classes)?has_content)?then(params.classes, "")}" role="contentinfo"<#list params.attributes!{} as attribute, value> ${attribute}="${value}"</#list>>
+  <div class="govuk-width-container ${((params.containerClasses)?has_content)?then(params.containerClasses, "")}">
     <#if (params.navigation?size)??>
       <div class="govuk-footer__navigation">
         <#list params.navigation![] as nav>
@@ -7,7 +7,7 @@
             <h2 class="govuk-footer__heading govuk-heading-m">${nav.title}</h2>
             <#if (nav.items?size)??>
               <#assign listClasses>
-                <#if (nav.columns)??>
+                <#if (nav.columns != 0) && (!nav.columns?is_nan)>
                   govuk-footer__list--columns-${nav.columns}
                 </#if>
               </#assign>
@@ -43,9 +43,9 @@
               </#list>
             </ul>
           </#if>
-          <#if (params.meta.text)?? || (params.meta.html)??>
+          <#if (params.meta.text)?has_content || (params.meta.html)?has_content>
             <div class="govuk-footer__meta-custom">
-              ${((params.meta.html)??)?then(params.meta.html?no_esc, params.meta.text)}
+              ${((params.meta.html)?has_content)?then(params.meta.html?no_esc, params.meta.text)}
             </div>
           </#if>
         </#if>
@@ -64,8 +64,8 @@
           />
         </svg>
         <span class="govuk-footer__licence-description">
-          <#if (params.contentLicence.html)?? || (params.contentLicence.text)??>
-            ${((params.contentLicence.html)??)?then(params.contentLicence.html?no_esc, params.contentLicence.text)}
+          <#if (params.contentLicence.html)?has_content || (params.contentLicence.text)?has_content>
+            ${((params.contentLicence.html)?has_content)?then(params.contentLicence.html?no_esc, params.contentLicence.text)}
           <#else>
             All content is available under the
             <a
@@ -80,7 +80,7 @@
         <a
           class="govuk-footer__link govuk-footer__copyright-logo"
           href="https://www.nationalarchives.gov.uk/information-management/re-using-public-sector-information/uk-government-licensing-framework/crown-copyright/"
-        ><#if (params.copyright.html)?? || (params.copyright.text)??>${((params.copyright.html)??)?then(params.copyright.html?no_esc, params.copyright.text)}<#else>© Crown copyright</#if></a>
+        ><#if (params.copyright.html)?has_content || (params.copyright.text)?has_content>${((params.copyright.html)?has_content)?then(params.copyright.html?no_esc, params.copyright.text)}<#else>© Crown copyright</#if></a>
       </div>
     </div>
   </div>
