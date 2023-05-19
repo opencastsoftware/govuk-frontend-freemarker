@@ -62,7 +62,7 @@ public abstract class GovukComponentTask extends DefaultTask {
 
         if ("array".equals(paramType)) {
             var listName = ClassName.get(List.class);
-            var elemTypeName = param.getParams().isEmpty() ? ClassName.get(Object.class) : getClassName(componentName, param.getName());
+            var elemTypeName = param.getParams().isEmpty() ? ClassName.get(String.class) : getClassName(componentName, param.getName());
             return ParameterizedTypeName.get(listName, elemTypeName);
         } else if ("object".equals(paramType)) {
             var mapName = ClassName.get(Map.class);

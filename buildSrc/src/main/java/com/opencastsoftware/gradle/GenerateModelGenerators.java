@@ -107,30 +107,40 @@ public abstract class GenerateModelGenerators extends GovukComponentTask {
         var paramName = param.getName();
         var paramType = param.getType();
         var newline = System.lineSeparator();
+        var genClassName = ClassName.get(OUT_PACKAGE, "ModelGenerators");
         var builderClassName = ClassName.get(MODEL_PACKAGE, WordUtils.capitalize(componentName), "Builder");
         var arbitrariesClassName = ClassName.get("net.jqwik.api", "Arbitraries");
+        var escapeClassName = ClassName.get("org.apache.commons.text", "StringEscapeUtils");
 
         var isComplexType = "object".equals(paramType) || "array".equals(paramType);
         var hasParameters = !param.getParams().isEmpty();
 
         if (isComplexType && hasParameters) {
-            var genClassName = ClassName.get(OUT_PACKAGE, "ModelGenerators");
             var methodName = getDeclarationName(componentName, param.getName());
-            var code = "object".equals(paramType)
-                    ? ".use($T.$N()).in($T::with$N)"
-                    : ".use($T.$N().list()).in($T::with$N)";
-            codeBuilder.add(code + newline, genClassName, methodName, builderClassName, WordUtils.capitalize(paramName));
+            var useCode = "object".equals(paramType) ? ".use($T.$N())" : ".use($T.$N().list())";
+            codeBuilder.add(useCode, genClassName, methodName);
             generateModelGenerator(modelGenBuilder, param.getParams(), methodName);
+        } else if (isComplexType) {
+            if ("object".equals(paramType)) {
+                codeBuilder.add(".use($T.maps($T.strings().alpha().ofMaxLength(10), $T.strings().ascii().ofMaxLength(20)))", arbitrariesClassName, arbitrariesClassName, arbitrariesClassName);
+            } else {
+                codeBuilder.add(".use($T.strings().ascii().ofMaxLength(20).list())", arbitrariesClassName);
+            }
         } else if ("integer".equals(paramType)) {
-            codeBuilder.add(".use($T.$N()).in($T::with$N)" + newline, arbitrariesClassName, "integers", builderClassName, WordUtils.capitalize(paramName));
+            codeBuilder.add(".use($T.integers())", arbitrariesClassName);
         } else if ("nunjucks-block".equals(paramType) || "html".equals(paramType) || ("string".equals(paramType) && "html".equals(paramName))) {
-            var escapeClassName = ClassName.get("org.apache.commons.text", "StringEscapeUtils");
-            codeBuilder.add(".use($T.strings().ascii().ofMaxLength(20).map($T::escapeHtml4)).in($T::with$N)" + newline, arbitrariesClassName, escapeClassName, builderClassName, WordUtils.capitalize(paramName));
+            codeBuilder.add(".use($T.strings().ascii().ofMaxLength(20).map($T::escapeHtml4))", arbitrariesClassName, escapeClassName);
         } else if ("string".equals(paramType)) {
-            codeBuilder.add(".use($T.strings().ascii().ofMaxLength(20)).in($T::with$N)" + newline, arbitrariesClassName, builderClassName, WordUtils.capitalize(paramName));
+            codeBuilder.add(".use($T.strings().ascii().ofMaxLength(20))", arbitrariesClassName);
         } else if ("boolean".equals(paramType)) {
-            codeBuilder.add(".use($T.of(true, false)).in($T::with$N)" + newline, arbitrariesClassName, builderClassName, WordUtils.capitalize(paramName));
+            codeBuilder.add(".use($T.of(true, false))", arbitrariesClassName);
         }
+
+        if (param.isRequired()) {
+            codeBuilder.add(".withProbability($L)", 1.0);
+        }
+
+        codeBuilder.add(".in($T::with$N)" + newline, builderClassName, WordUtils.capitalize(paramName));
     }
 
     private void generateModelGenerator(TypeSpec.Builder modelGenBuilder, List<ParameterSchema> params, String componentName) throws IOException {
