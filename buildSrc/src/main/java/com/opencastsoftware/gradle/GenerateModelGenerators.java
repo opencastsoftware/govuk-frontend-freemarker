@@ -117,14 +117,14 @@ public abstract class GenerateModelGenerators extends GovukComponentTask {
 
         if (isComplexType && hasParameters) {
             var methodName = getDeclarationName(componentName, param.getName());
-            var useCode = "object".equals(paramType) ? ".use($T.$N())" : ".use($T.$N().list())";
+            var useCode = "object".equals(paramType) ? ".use($T.$N())" : ".use($T.$N().list().ofMaxSize(5))";
             codeBuilder.add(useCode, genClassName, methodName);
             generateModelGenerator(modelGenBuilder, param.getParams(), methodName);
         } else if (isComplexType) {
             if ("object".equals(paramType)) {
-                codeBuilder.add(".use($T.maps($T.strings().alpha().ofMaxLength(10), $T.strings().ascii().ofMaxLength(20)))", arbitrariesClassName, arbitrariesClassName, arbitrariesClassName);
+                codeBuilder.add(".use($T.maps($T.strings().alpha().ofMaxLength(10), $T.strings().ascii().ofMaxLength(20)).ofMaxSize(5))", arbitrariesClassName, arbitrariesClassName, arbitrariesClassName);
             } else {
-                codeBuilder.add(".use($T.strings().ascii().ofMaxLength(20).list())", arbitrariesClassName);
+                codeBuilder.add(".use($T.strings().ascii().ofMaxLength(20).list().ofMaxSize(5))", arbitrariesClassName);
             }
         } else if ("integer".equals(paramType)) {
             codeBuilder.add(".use($T.integers())", arbitrariesClassName);
