@@ -54,6 +54,7 @@ testing {
                     implementation(libs.jacksonDataBind)
                     implementation(libs.xmlUnitLegacy)
                     implementation(libs.xmlUnitMatchers)
+                    implementation(libs.apacheCommonsText)
                 }
             }
 

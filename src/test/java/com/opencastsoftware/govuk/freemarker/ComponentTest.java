@@ -6,10 +6,15 @@ package com.opencastsoftware.govuk.freemarker;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import freemarker.cache.ClassTemplateLoader;
+import freemarker.cache.MultiTemplateLoader;
+import freemarker.cache.StringTemplateLoader;
+import freemarker.cache.TemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
+import org.apache.commons.text.CaseUtils;
 import org.custommonkey.xmlunit.HTMLDocumentBuilder;
 import org.custommonkey.xmlunit.TolerantSaxDocumentBuilder;
 import org.custommonkey.xmlunit.XMLUnit;
@@ -58,7 +63,9 @@ public abstract class ComponentTest<A> {
         this.componentName = componentName;
         this.config = templateConfiguration();
         this.objectMapper.setSerializationInclusion(Include.NON_NULL);
-        config.setClassForTemplateLoading(Params.class, "components");
+        var stringTemplateLoader = new StringTemplateLoader();
+        var classTemplateLoader = new ClassTemplateLoader(Params.class, "");
+        config.setTemplateLoader(new MultiTemplateLoader(new TemplateLoader[]{stringTemplateLoader, classTemplateLoader}));
         config.setDefaultEncoding(StandardCharsets.UTF_8.name());
         config.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
         config.setLogTemplateExceptions(false);
@@ -66,7 +73,12 @@ public abstract class ComponentTest<A> {
         config.setFallbackOnNullLoopVariable(false);
         config.setNumberFormat("c");
         config.setBooleanFormat("c");
-        this.template = config.getTemplate(this.componentName + "/template.ftlh");
+        var camelCaseName = CaseUtils.toCamelCase(componentName, true, '-');
+        stringTemplateLoader.putTemplate(
+                componentName,
+                "<#import \"./components/" + componentName + ".ftlh\" as m>" + System.lineSeparator() +
+                "<@m.govuk" + camelCaseName + "Macro params=params />");
+        this.template = config.getTemplate(componentName);
     }
 
     protected Document renderNunjucks(A dataModel) throws IOException, InterruptedException, SAXException {

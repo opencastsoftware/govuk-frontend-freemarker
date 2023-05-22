@@ -24,8 +24,6 @@ import java.util.stream.Collectors;
 public abstract class GovukComponentTask extends DefaultTask {
     protected final Yaml yaml;
 
-    private final char[] CASE_DELIMITERS = new char[]{'-'};
-
     protected final String MODEL_PACKAGE = "com.opencastsoftware.govuk.freemarker";
 
     public GovukComponentTask() {
@@ -39,7 +37,7 @@ public abstract class GovukComponentTask extends DefaultTask {
     }
 
     protected String kebabCaseToCamelCase(String kebab, boolean upperCase) {
-        return CaseUtils.toCamelCase(kebab, upperCase, CASE_DELIMITERS);
+        return CaseUtils.toCamelCase(kebab, upperCase, '-');
     }
 
     protected String getDeclarationName(String componentName, String paramName) {
@@ -89,14 +87,16 @@ public abstract class GovukComponentTask extends DefaultTask {
             return params;
         }
 
-        var groupedParams = params.stream().collect(Collectors.groupingBy(
-                // Some parameter entries are not nested appropriately, so they
-                // may have names like `conditional.html`.
-                // We need to group by the first part of these names.
-                param -> param.getName().split("\\.")[0],
-                LinkedHashMap::new,
-                Collectors.toList()
-        ));
+        var groupedParams = params.stream()
+                .filter(param -> !"caller".equals(param.getName()))
+                .collect(Collectors.groupingBy(
+                        // Some parameter entries are not nested appropriately, so they
+                        // may have names like `conditional.html`.
+                        // We need to group by the first part of these names.
+                        param -> param.getName().split("\\.")[0],
+                        LinkedHashMap::new,
+                        Collectors.toList()
+                ));
 
         return groupedParams.entrySet().stream()
                 .map(entry -> {
