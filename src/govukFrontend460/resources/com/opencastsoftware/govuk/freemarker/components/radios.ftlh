@@ -1,16 +1,16 @@
 <#macro govukRadiosMacro params>
   <#import "./error-message.ftlh" as errorMessage><#import "./fieldset.ftlh" as fieldset>
   <#import "./hint.ftlh" as hint>
-  <#import "./label.ftlh" as label><#local idPrefix=((params.idPrefix)?has_content)?then(params.idPrefix, params.name)><#local describedBy=((params.fieldset.describedBy)??)?then(params.fieldset.describedBy, "")><#local innerHtml>
+  <#import "./label.ftlh" as label><#local idPrefix=((params.idPrefix)?has_content)?then(params.idPrefix, params.name)><#local describedBy=((params.fieldset.describedBy)?has_content)?then(params.fieldset.describedBy, "")><#local innerHtml>
   <#if (params.hint)??>
     <#local hintId=idPrefix + "-hint">
     <#local describedBy=((describedBy)??)?then(describedBy + " " + hintId, hintId)>
-    ${hint.govukHint({ "id": hintId, "classes": params.hint.classes, "attributes": params.hint.attributes, "html": params.hint.html, "text": params.hint.text })?trim}
+    ${hint.govukHint({ "html": params.hint.html, "text": params.hint.text } + (hintId)?then({ "id": hintId }, {}) + (params.hint.classes)?then({ "classes": params.hint.classes }, {}) + (params.hint.attributes)?then({ "attributes": params.hint.attributes }, {}))?trim}
   </#if>
   <#if (params.errorMessage)??>
     <#local errorId=idPrefix + "-error">
     <#local describedBy=((describedBy)??)?then(describedBy + " " + errorId, errorId)>
-    ${errorMessage.govukErrorMessage({ "id": errorId, "classes": params.errorMessage.classes, "attributes": params.errorMessage.attributes, "html": params.errorMessage.html, "text": params.errorMessage.text, "visuallyHiddenText": params.errorMessage.visuallyHiddenText })?trim}
+    ${errorMessage.govukErrorMessage({ "html": params.errorMessage.html, "text": params.errorMessage.text } + (errorId)?then({ "id": errorId }, {}) + (params.errorMessage.classes)?then({ "classes": params.errorMessage.classes }, {}) + (params.errorMessage.attributes)?then({ "attributes": params.errorMessage.attributes }, {}) + (params.errorMessage.visuallyHiddenText)?then({ "visuallyHiddenText": params.errorMessage.visuallyHiddenText }, {}))?trim}
   </#if>
     <div class="govuk-radios<#if (params.classes)?has_content> ${params.classes}</#if>"<#list params.attributes!{} as attribute, value> ${attribute}="${value}"</#list>
       data-module="govuk-radios">
@@ -18,19 +18,19 @@
         <#if (item)??><#if (item.id)?has_content><#local id=item.id><#else><#if (item?is_first)??><#local id=idPrefix>
             <#else><#local id=idPrefix + "-" + item?counter></#if></#if><#local conditionalId="conditional-" + id><#if (item.divider)?has_content>
           <div class="govuk-radios__divider">${item.divider}</div><#else>
-          <#local isChecked=item.checked!(params.value)?has_content && (item.value == params.value)??>
+          <#local isChecked=item.checked!((params.value)?has_content && (item.value == params.value)??)>
           <#local hasHint=((item.hint.text)?? || (item.hint.html)??)?then(true, "")>
           <#local itemHintId=id + "-item-hint">
           <div class="govuk-radios__item">
             <input class="govuk-radios__input" id="${id}" name="${params.name}" type="radio" value="${item.value}"${((isChecked)??)?then(" checked", "")}${((item.disabled)?? && item.disabled)?then(" disabled", "")}<#if (item.conditional.html)?has_content> data-aria-controls="${conditionalId}"</#if><#if (hasHint)??> aria-describedby="${itemHintId}"</#if><#list item.attributes!{} as attribute, value> ${attribute}="${value}"</#list>>
-            ${label.govukLabel({ "html": item.html, "text": item.text, "classes": "govuk-radios__label" + (((item.label.classes)??)?then(" " + item.label.classes, "")), "attributes": item.label.attributes, "for": id })?trim}
+            ${label.govukLabel({ "html": item.html, "text": item.text } + ("govuk-radios__label" + (((item.label.classes)??)?then(" " + item.label.classes, "")))?then({ "classes": "govuk-radios__label" + (((item.label.classes)??)?then(" " + item.label.classes, "")) }, {}) + (item.label.attributes)?then({ "attributes": item.label.attributes }, {}) + (id)?then({ "for": id }, {}))?trim}
             <#if (hasHint)??>
-            ${hint.govukHint({ "id": itemHintId, "classes": "govuk-radios__hint" + (((item.hint.classes)??)?then(" " + item.hint.classes, "")), "attributes": item.hint.attributes, "html": item.hint.html, "text": item.hint.text })?trim}
+            ${hint.govukHint((itemHintId)?then({ "id": itemHintId }, {}) + ("govuk-radios__hint" + (((item.hint.classes)??)?then(" " + item.hint.classes, "")))?then({ "classes": "govuk-radios__hint" + (((item.hint.classes)??)?then(" " + item.hint.classes, "")) }, {}) + (item.hint.attributes)?then({ "attributes": item.hint.attributes }, {}) + (item.hint.html)?then({ "html": item.hint.html }, {}) + (item.hint.text)?then({ "text": item.hint.text }, {}))?trim}
             </#if>
           </div>
           <#if (item.conditional.html)?has_content>
             <div class="govuk-radios__conditional<#if !(isChecked)??> govuk-radios__conditional--hidden</#if>" id="${conditionalId}">
-              ${item.conditional.html?no_esc}
+              ${item.conditional.html?markup_string?no_esc}
             </div>
           </#if>
           </#if>
@@ -39,7 +39,7 @@
     </div>
   </#local><div class="govuk-form-group<#if (params.errorMessage)??> govuk-form-group--error</#if><#if (params.formGroup.classes)?has_content> ${params.formGroup.classes}</#if>">
   <#if (params.fieldset)??>
-    <@fieldset.govukFieldsetMacro params={ "describedBy": describedBy, "classes": params.fieldset.classes, "attributes": params.fieldset.attributes, "legend": params.fieldset.legend }>
+    <@fieldset.govukFieldsetMacro params=(describedBy)?then({ "describedBy": describedBy }, {}) + (params.fieldset.classes)?then({ "classes": params.fieldset.classes }, {}) + (params.fieldset.attributes)?then({ "attributes": params.fieldset.attributes }, {}) + (params.fieldset.legend)?then({ "legend": params.fieldset.legend }, {})>
     ${innerHtml?markup_string?trim?no_esc}
     </@fieldset.govukFieldsetMacro>
   <#else>

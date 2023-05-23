@@ -2,18 +2,18 @@
   <#import "./error-message.ftlh" as errorMessage><#import "./fieldset.ftlh" as fieldset>
   <#import "./hint.ftlh" as hint>
   <#import "./label.ftlh" as label><#local idPrefix=((params.idPrefix)?has_content)?then(params.idPrefix, params.name)><#local describedBy=((params.describedBy)?has_content)?then(params.describedBy, "")>
-  <#if (params.fieldset.describedBy)??>
+  <#if (params.fieldset.describedBy)?has_content>
      <#local describedBy=params.fieldset.describedBy>
   </#if><#local hasFieldset=((params.fieldset)??)?then(true, false)><#local innerHtml>
   <#if (params.hint)??>
     <#local hintId=idPrefix + "-hint">
     <#local describedBy=((describedBy)??)?then(describedBy + " " + hintId, hintId)>
-    ${hint.govukHint({ "id": hintId, "classes": params.hint.classes, "attributes": params.hint.attributes, "html": params.hint.html, "text": params.hint.text })?trim}
+    ${hint.govukHint({ "html": params.hint.html, "text": params.hint.text } + (hintId)?then({ "id": hintId }, {}) + (params.hint.classes)?then({ "classes": params.hint.classes }, {}) + (params.hint.attributes)?then({ "attributes": params.hint.attributes }, {}))?trim}
   </#if>
   <#if (params.errorMessage)??>
     <#local errorId=idPrefix + "-error">
     <#local describedBy=((describedBy)??)?then(describedBy + " " + errorId, errorId)>
-    ${errorMessage.govukErrorMessage({ "id": errorId, "classes": params.errorMessage.classes, "attributes": params.errorMessage.attributes, "html": params.errorMessage.html, "text": params.errorMessage.text, "visuallyHiddenText": params.errorMessage.visuallyHiddenText })?trim}
+    ${errorMessage.govukErrorMessage({ "html": params.errorMessage.html, "text": params.errorMessage.text } + (errorId)?then({ "id": errorId }, {}) + (params.errorMessage.classes)?then({ "classes": params.errorMessage.classes }, {}) + (params.errorMessage.attributes)?then({ "attributes": params.errorMessage.attributes }, {}) + (params.errorMessage.visuallyHiddenText)?then({ "visuallyHiddenText": params.errorMessage.visuallyHiddenText }, {}))?trim}
   </#if>
     <div class="govuk-checkboxes<#if (params.classes)?has_content> ${params.classes}</#if>"<#list params.attributes!{} as attribute, value> ${attribute}="${value}"</#list>
       data-module="govuk-checkboxes">
@@ -22,16 +22,16 @@
             <#else><#local id=idPrefix + "-" + item?counter></#if></#if><#local name=((item.name)?has_content)?then(item.name, params.name)>
           <#local conditionalId="conditional-" + id><#if (item.divider)?has_content>
             <div class="govuk-checkboxes__divider">${item.divider}</div><#else>
-            <#local isChecked=item.checked!(params.values)?? && (item.value[params.values]??)??>
+            <#local isChecked=item.checked!((params.values)?? && (item.value[params.values]??)??)>
             <#local hasHint=((item.hint.text)?? || (item.hint.html)??)?then(true, "")>
             <#local itemHintId=((hasHint)??)?then(id + "-item-hint", "")>
             <#local itemDescribedBy=(!(hasFieldset)??)?then(describedBy, "")>
             <#local itemDescribedBy=(itemDescribedBy + " " + itemHintId)?trim>
             <div class="govuk-checkboxes__item">
               <input class="govuk-checkboxes__input" id="${id}" name="${name}" type="checkbox" value="${item.value}"${((isChecked)??)?then(" checked", "")}${((item.disabled)?? && item.disabled)?then(" disabled", "")}<#if (item.conditional.html)?has_content> data-aria-controls="${conditionalId}"</#if><#if (item.behaviour)?has_content> data-behaviour="${item.behaviour}"</#if><#if (itemDescribedBy)??> aria-describedby="${itemDescribedBy}"</#if><#list item.attributes!{} as attribute, value> ${attribute}="${value}"</#list>>
-              ${label.govukLabel({ "html": item.html, "text": item.text, "classes": "govuk-checkboxes__label" + (((item.label.classes)??)?then(" " + item.label.classes, "")), "attributes": item.label.attributes, "for": id })?trim}
+              ${label.govukLabel({ "html": item.html, "text": item.text } + ("govuk-checkboxes__label" + (((item.label.classes)??)?then(" " + item.label.classes, "")))?then({ "classes": "govuk-checkboxes__label" + (((item.label.classes)??)?then(" " + item.label.classes, "")) }, {}) + (item.label.attributes)?then({ "attributes": item.label.attributes }, {}) + (id)?then({ "for": id }, {}))?trim}
               <#if (hasHint)??>
-              ${hint.govukHint({ "id": itemHintId, "classes": "govuk-checkboxes__hint" + (((item.hint.classes)??)?then(" " + item.hint.classes, "")), "attributes": item.hint.attributes, "html": item.hint.html, "text": item.hint.text })?trim}
+              ${hint.govukHint((itemHintId)?then({ "id": itemHintId }, {}) + ("govuk-checkboxes__hint" + (((item.hint.classes)??)?then(" " + item.hint.classes, "")))?then({ "classes": "govuk-checkboxes__hint" + (((item.hint.classes)??)?then(" " + item.hint.classes, "")) }, {}) + (item.hint.attributes)?then({ "attributes": item.hint.attributes }, {}) + (item.hint.html)?then({ "html": item.hint.html }, {}) + (item.hint.text)?then({ "text": item.hint.text }, {}))?trim}
               </#if>
             </div>
             <#if (item.conditional.html)?has_content>
@@ -45,7 +45,7 @@
     </div>
   </#local><div class="govuk-form-group<#if (params.errorMessage)??> govuk-form-group--error</#if><#if (params.formGroup.classes)?has_content> ${params.formGroup.classes}</#if>">
   <#if (params.fieldset)??>
-    <@fieldset.govukFieldsetMacro params={ "describedBy": describedBy, "classes": params.fieldset.classes, "attributes": params.fieldset.attributes, "legend": params.fieldset.legend }>
+    <@fieldset.govukFieldsetMacro params=(describedBy)?then({ "describedBy": describedBy }, {}) + (params.fieldset.classes)?then({ "classes": params.fieldset.classes }, {}) + (params.fieldset.attributes)?then({ "attributes": params.fieldset.attributes }, {}) + (params.fieldset.legend)?then({ "legend": params.fieldset.legend }, {})>
     ${innerHtml?markup_string?trim?no_esc}
     </@fieldset.govukFieldsetMacro>
   <#else>

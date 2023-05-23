@@ -1,7 +1,7 @@
 <#macro govukTabsMacro params>
   <#local idPrefix=((params.idPrefix)?has_content)?then(params.idPrefix, "")><div<#if (params.id)?has_content> id="${params.id}"</#if> class="govuk-tabs<#if (params.classes)?has_content> ${params.classes}</#if>"<#list params.attributes!{} as attribute, value> ${attribute}="${value}"</#list> data-module="govuk-tabs">
     <h2 class="govuk-tabs__title">
-      ${params.title!"Contents"}
+      ${params.title!("Contents")}
     </h2>
     <#if ((params.items?size))??>
     <ul class="govuk-tabs__list">

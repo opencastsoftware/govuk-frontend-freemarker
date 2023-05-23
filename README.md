@@ -44,7 +44,9 @@ For this example we will follow [the instructions](https://freemarker.apache.org
 
 ```java
 var config = new Configuration(Configuration.VERSION_2_3_32);
-config.setClassForTemplateLoading(Params.class, "components");
+var stringTemplateLoader = new StringTemplateLoader();
+var govukTemplateLoader = new ClassTemplateLoader(Params.class, "");
+config.setTemplateLoader(new MultiTemplateLoader(new TemplateLoader[] { stringTemplateLoader, govukTemplateLoader }));
 config.setDefaultEncoding(StandardCharsets.UTF_8.name());
 config.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
 config.setLogTemplateExceptions(false);
@@ -52,9 +54,15 @@ config.setWrapUncheckedExceptions(true);
 config.setFallbackOnNullLoopVariable(false);
 ```
 
-Please note the invocation of `setClassForTemplateLoading`. Templates will be resolved relative to the class and package prefix used in this call.
+Please note the parameters of the `ClassTemplateLoader`. *govuk-frontend-freemarker* templates will be resolved relative to the class `com.opencastsoftware.govuk.freemarker.Params` and the package prefix used in this call.
 
-In addition, we will set the FreeMarker `boolean_format` and `number_format` settings to `"c"`, the setting for computers.
+In our examples, the `StringTemplateLoader` is used to load templates making use of the *govuk-frontend-freemarker* components.
+
+This indirection is needed because FreeMarker templates instantiated via the `Template` constructor cannot import other templates. Only templates loaded via a `TemplateLoader` can do so.
+
+In practice you will probably want to use another `ClassTemplateLoader` to load your custom templates from the classpath.
+
+In addition to the setup above, we will set the FreeMarker `boolean_format` and `number_format` settings to `"c"`, the setting for computers.
 
 ```java
 config.setBooleanFormat("c");
@@ -65,18 +73,30 @@ This is because Nunjucks does not have any special formatting behaviour for numb
 
 ### Get a Template instance
 
-Template names reflect the structure used in [govuk-frontend](https://github.com/alphagov/govuk-frontend), so each component possesses:
+Each component is represented by a Freemarker `*.ftlh` file named according to the component directory in [govuk-frontend](https://github.com/alphagov/govuk-frontend). The `*.ftlh` extension enables FreeMarker's HTML auto-escaping behaviour.
 
-* a `macro.ftlh` file - containing the interface for rendering the component within other templates
-* a `template.ftlh` file - containing the template content
+For example, to import the `accordion` component, we will import `"./components/accordion.ftlh"`.
+
+Each component is defined as a FreeMarker macro with the prefix `govuk` and suffix `Macro`.
+
+A FreeMarker function is also defined for each component which allows using that component in interpolations.
 
 ```java
-var template = config.getTemplate("accordion/template.ftlh");
+stringTemplateLoader.putTemplate(
+    "test",
+    "<#import \"./components/accordion.ftlh\" as accordion>" +
+    // Usage of the macro definition
+    "<@accordion.govukAccordionMacro params=params />" +
+    // Usage of the function definition
+    "${accordion.govukAccordion(params)}"
+);
+
+var template = config.getTemplate("test");
 ```
 
 ### Populate the data model
 
-Each data model class has a `Builder` class which enables you to build up the parameters of the template incrementally.
+Each data model class has a `Builder` class which enables you to build up the parameters of the component incrementally.
 
 For example, the simplest invocation of the `accordion` component is as follows:
 
@@ -84,12 +104,12 @@ For example, the simplest invocation of the `accordion` component is as follows:
 var accordion = Accordion.builder()
   .withId("example-id")
   .withItems(List.of())
-  .build()
+  .build();
 ```
 
 ### Render the template
 
-Every template accepts a top-level `Params` object containing the data model.
+Every component macro and wrapper function accepts a top-level `Params` object containing the data model.
 
 This reflects the structure of the original Nunjucks templates.
 

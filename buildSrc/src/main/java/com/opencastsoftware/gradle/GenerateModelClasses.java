@@ -1,29 +1,20 @@
 package com.opencastsoftware.gradle;
 
 import com.squareup.javapoet.*;
-import org.apache.commons.lang3.stream.Streams;
 import org.apache.commons.text.WordUtils;
 import org.gradle.api.file.DirectoryProperty;
-import org.gradle.api.tasks.InputDirectory;
 import org.gradle.api.tasks.OutputDirectory;
-import org.gradle.api.tasks.TaskAction;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.lang.model.element.Modifier;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
-import java.util.regex.Pattern;
 
 public abstract class GenerateModelClasses extends GovukComponentTask {
-    @InputDirectory
-    abstract public DirectoryProperty getRepositoryDir();
-
     @OutputDirectory
     abstract public DirectoryProperty getGeneratedSourcesDir();
 
@@ -146,7 +137,7 @@ public abstract class GenerateModelClasses extends GovukComponentTask {
         typeSpec.addMethod(constructor.build());
     }
 
-    private void generateBuilder(TypeSpec.Builder typeSpec, ClassName className, List<ParameterSchema> params) throws IOException {
+    private void generateBuilder(TypeSpec.Builder typeSpec, ClassName className, List<ParameterSchema> params) {
         var builderName = ClassName.get(className.packageName(), className.simpleName(), "Builder");
 
         var builder = TypeSpec.classBuilder(builderName)
@@ -236,22 +227,8 @@ public abstract class GenerateModelClasses extends GovukComponentTask {
         paramsFile.writeTo(srcDir);
     }
 
-    private void generateModelClass(Path schemaPath) throws IOException {
-        try (var input = new FileInputStream(schemaPath.toFile())) {
-            var componentDir = schemaPath.getParent().getFileName().toString();
-            var componentSchema = yaml.<ComponentSchema>load(input);
-            preProcessSchema(componentSchema);
-            generateModelClass(componentSchema.getParams(), kebabCaseToCamelCase(componentDir));
-        }
-    }
-
-    @TaskAction
-    public void generate() throws IOException {
-        var componentsPath = getRepositoryDir().getAsFile().get().toPath()
-                .resolve("src").resolve("govuk").resolve("components");
-
-        try (var files = Files.find(componentsPath, Integer.MAX_VALUE, this::isParameterSchema)) {
-            Streams.stream(files).forEach(this::generateModelClass);
-        }
+    @Override
+    protected void generate(Map.Entry<String, ComponentSchema> component) throws IOException {
+        generateModelClass(component.getValue().getParams(), component.getKey());
     }
 }

@@ -9,6 +9,9 @@ import java.util.Collections;
 import java.util.List;
 
 public class ComponentSchema {
+    private String kebabCaseName;
+    private List<ParameterSchema> params = Collections.emptyList();
+
     public ComponentSchema() {
 
     }
@@ -17,7 +20,14 @@ public class ComponentSchema {
         this.params = params;
     }
 
-    private List<ParameterSchema> params = Collections.emptyList();
+    public String getKebabCaseName() {
+        return kebabCaseName;
+    }
+
+    public void setKebabCaseName(String kebabCaseName) {
+        this.kebabCaseName = kebabCaseName;
+    }
+
 
     public List<ParameterSchema> getParams() {
         return params;
@@ -30,6 +40,7 @@ public class ComponentSchema {
     @Override
     public int hashCode() {
         return new HashCodeBuilder()
+                .append(kebabCaseName)
                 .append(params)
                 .toHashCode();
     }
@@ -47,6 +58,7 @@ public class ComponentSchema {
         }
         var other = (ComponentSchema) obj;
         return new EqualsBuilder()
+                .append(kebabCaseName, other.kebabCaseName)
                 .append(params, other.params)
                 .isEquals();
     }
@@ -54,6 +66,7 @@ public class ComponentSchema {
     @Override
     public String toString() {
         return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
+                .append("kebabCaseName", kebabCaseName)
                 .append("params", params)
                 .toString();
     }

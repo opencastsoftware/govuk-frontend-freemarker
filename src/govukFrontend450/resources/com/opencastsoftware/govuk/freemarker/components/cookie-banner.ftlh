@@ -1,5 +1,5 @@
 <#macro govukCookieBannerMacro params>
-  <#import "./button.ftlh" as button><div class="govuk-cookie-banner ${((params.classes)?has_content)?then(params.classes, "")}" data-nosnippet role="region" aria-label="${params.ariaLabel!"Cookie banner"}"<#if (params.hidden)?? && params.hidden> hidden</#if><#list params.attributes!{} as attribute, value> ${attribute}="${value}"</#list>><#list params.messages as message>
+  <#import "./button.ftlh" as button><div class="govuk-cookie-banner ${((params.classes)?has_content)?then(params.classes, "")}" data-nosnippet role="region" aria-label="${params.ariaLabel!("Cookie banner")}"<#if (params.hidden)?? && params.hidden> hidden</#if><#list params.attributes!{} as attribute, value> ${attribute}="${value}"</#list>><#list params.messages as message>
       <#local classNames="govuk-cookie-banner__message govuk-width-container">
       <#if (message.classes)?has_content>
         <#local classNames=classNames + " " + message.classes>
@@ -22,7 +22,7 @@
           <#list message.actions![] as action>
             <#if (action.href)??>
               <#if (action.type == "button")??>
-                ${button.govukButton({ "text": action.text, "type": "button", "classes": action.classes, "href": action.href, "attributes": action.attributes })?trim}
+                ${button.govukButton({ "type": "button" } + (action.text)?then({ "text": action.text }, {}) + (action.classes)?then({ "classes": action.classes }, {}) + (action.href)?then({ "href": action.href }, {}) + (action.attributes)?then({ "attributes": action.attributes }, {}))?trim}
               <#else>
                 <#local linkClasses="govuk-link">
                 <#if (action.classes)??>
@@ -31,7 +31,7 @@
                 <a class="${linkClasses}" href="${action.href}"<#list action.attributes![] as attribute, value> ${attribute}="${value}"</#list>>${action.text}</a>
               </#if>
             <#else>
-              ${button.govukButton({ "text": action.text, "value": action.value, "name": action.name, "type": action.type, "classes": action.classes, "attributes": action.attributes })?trim}
+              ${button.govukButton((action.text)?then({ "text": action.text }, {}) + (action.value)?then({ "value": action.value }, {}) + (action.name)?then({ "name": action.name }, {}) + (action.type)?then({ "type": action.type }, {}) + (action.classes)?then({ "classes": action.classes }, {}) + (action.attributes)?then({ "attributes": action.attributes }, {}))?trim}
             </#if>
           </#list>
         </div>

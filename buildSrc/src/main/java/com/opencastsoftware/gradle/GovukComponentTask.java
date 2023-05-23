@@ -3,28 +3,36 @@ package com.opencastsoftware.gradle;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
+import org.apache.commons.lang3.stream.Streams;
 import org.apache.commons.text.CaseUtils;
 import org.apache.commons.text.WordUtils;
 import org.gradle.api.DefaultTask;
-import org.gradle.api.provider.Property;
-import org.gradle.api.tasks.Input;
+import org.gradle.api.file.DirectoryProperty;
+import org.gradle.api.tasks.InputDirectory;
+import org.gradle.api.tasks.TaskAction;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.representer.Representer;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public abstract class GovukComponentTask extends DefaultTask {
+    @InputDirectory
+    abstract public DirectoryProperty getRepositoryDir();
+
     protected final Yaml yaml;
 
     protected final String MODEL_PACKAGE = "com.opencastsoftware.govuk.freemarker";
+
+    protected final Map<String, ComponentSchema> componentSchemas = new HashMap<>();
 
     public GovukComponentTask() {
         var representer = new Representer(new DumperOptions());
@@ -62,6 +70,8 @@ public abstract class GovukComponentTask extends DefaultTask {
             var listName = ClassName.get(List.class);
             var elemTypeName = param.getParams().isEmpty() ? ClassName.get(String.class) : getClassName(componentName, param.getName());
             return ParameterizedTypeName.get(listName, elemTypeName);
+        } else if ("object".equals(paramType) && Optional.ofNullable(param.isComponent()).orElse(false)) {
+            return ClassName.get(MODEL_PACKAGE, WordUtils.capitalize(param.getName()));
         } else if ("object".equals(paramType)) {
             var mapName = ClassName.get(Map.class);
             var mapTypeName = ParameterizedTypeName.get(mapName, ClassName.get(String.class), ClassName.get(String.class));
@@ -128,6 +138,7 @@ public abstract class GovukComponentTask extends DefaultTask {
                                 "object",
                                 true,
                                 null,
+                                false,
                                 innerParams);
                     }
 
@@ -136,5 +147,34 @@ public abstract class GovukComponentTask extends DefaultTask {
 
     protected void preProcessSchema(ComponentSchema schema) {
         schema.setParams(preProcessParamSchemas(schema.getParams()));
+    }
+
+    private void readComponentSchema(Path schemaPath) throws IOException {
+        try (var input = new FileInputStream(schemaPath.toFile())) {
+            var componentDir = schemaPath.getParent().getFileName().toString();
+            var componentSchema = yaml.<ComponentSchema>load(input);
+            componentSchema.setKebabCaseName(componentDir);
+            preProcessSchema(componentSchema);
+            componentSchemas.put(kebabCaseToCamelCase(componentDir), componentSchema);
+        }
+    }
+
+    protected void generate(Map.Entry<String, ComponentSchema> component) throws IOException {
+
+    }
+
+    @TaskAction
+    public void generate() throws IOException {
+        var componentsPath = getRepositoryDir().getAsFile().get().toPath()
+                .resolve("src").resolve("govuk").resolve("components");
+
+        // We need to read all schemas so that they can be cross-referenced later
+        try (var files = Files.find(componentsPath, Integer.MAX_VALUE, this::isParameterSchema)) {
+            Streams.stream(files).forEach(this::readComponentSchema);
+        }
+
+        for (var component : componentSchemas.entrySet()) {
+            generate(component);
+        }
     }
 }

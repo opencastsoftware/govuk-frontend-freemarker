@@ -13,24 +13,28 @@ public class ParameterSchema {
     private String type;
     private Boolean required;
     private String description;
+
+    private Boolean isComponent;
     private List<ParameterSchema> params = Collections.emptyList();
 
     public ParameterSchema() {
 
     }
 
-    public ParameterSchema(String name, String type, Boolean required, String description) {
+    public ParameterSchema(String name, String type, Boolean required, String description, Boolean isComponent) {
         this.name = name;
         this.type = type;
         this.required = required;
+        this.isComponent = isComponent;
         this.description = description;
     }
 
-    public ParameterSchema(String name, String type, Boolean required, String description, List<ParameterSchema> params) {
+    public ParameterSchema(String name, String type, Boolean required, String description, Boolean isComponent, List<ParameterSchema> params) {
         this.name = name;
         this.type = type;
         this.required = required;
         this.description = description;
+        this.isComponent = isComponent;
         this.params = params;
     }
 
@@ -66,6 +70,14 @@ public class ParameterSchema {
         this.description = description;
     }
 
+    public Boolean isComponent() {
+        return isComponent;
+    }
+
+    public void setIsComponent(Boolean isComponent) {
+        this.isComponent = isComponent;
+    }
+
     public List<ParameterSchema> getParams() {
         return params;
     }
@@ -81,6 +93,7 @@ public class ParameterSchema {
                 .append(type)
                 .append(required)
                 .append(description)
+                .append(isComponent)
                 .append(params)
                 .toHashCode();
     }
@@ -102,6 +115,7 @@ public class ParameterSchema {
                 .append(type, other.type)
                 .append(required, other.required)
                 .append(description, other.description)
+                .append(isComponent, other.isComponent)
                 .append(params, other.params)
                 .isEquals();
     }
@@ -113,6 +127,7 @@ public class ParameterSchema {
                 .append("type", type)
                 .append("required", required)
                 .append("description", description)
+                .append("isComponent", isComponent)
                 .append("params", params)
                 .toString();
     }

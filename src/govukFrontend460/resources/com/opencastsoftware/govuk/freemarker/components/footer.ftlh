@@ -4,7 +4,7 @@
       <#if (params.navigation?size)??>
         <div class="govuk-footer__navigation">
           <#list params.navigation![] as nav>
-            <div class="govuk-footer__section govuk-grid-column-${nav.width!"full"}">
+            <div class="govuk-footer__section govuk-grid-column-${nav.width!("full")}">
               <h2 class="govuk-footer__heading govuk-heading-m">${nav.title}</h2>
               <#if (nav.items?size)??>
                 <#local listClasses>
@@ -32,7 +32,7 @@
       <div class="govuk-footer__meta">
         <div class="govuk-footer__meta-item govuk-footer__meta-item--grow">
           <#if (params.meta)??>
-            <h2 class="govuk-visually-hidden">${params.meta.visuallyHiddenTitle!"Support links"}</h2>
+            <h2 class="govuk-visually-hidden">${params.meta.visuallyHiddenTitle!("Support links")}</h2>
             <#if (params.meta.items?size)??>
               <ul class="govuk-footer__inline-list">
                 <#list params.meta.items![] as item>

@@ -1,27 +1,19 @@
 package com.opencastsoftware.gradle;
 
 import com.squareup.javapoet.*;
-import org.apache.commons.lang3.stream.Streams;
 import org.apache.commons.text.WordUtils;
 import org.gradle.api.file.DirectoryProperty;
-import org.gradle.api.tasks.InputDirectory;
 import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.TaskAction;
 
 import javax.lang.model.element.Modifier;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.regex.Pattern;
 
 public abstract class GenerateModelGenerators extends GovukComponentTask {
-    @InputDirectory
-    abstract public DirectoryProperty getRepositoryDir();
-
     @OutputDirectory
     abstract public DirectoryProperty getGeneratedSourcesDir();
 
@@ -31,10 +23,15 @@ public abstract class GenerateModelGenerators extends GovukComponentTask {
     private final String MODEL_PACKAGE = "com.opencastsoftware.govuk.freemarker";
     private final String OUT_PACKAGE = "com.opencastsoftware.govuk.freemarker.generators";
 
-    private void generateCanProvideFor(TypeSpec.Builder typeBuilder, String componentDir) {
+    private final Pattern HTML_PATTERN = Pattern.compile("[Hh]tml");
+
+    private final TypeSpec.Builder modelGenBuilder = TypeSpec
+            .classBuilder(ClassName.get(OUT_PACKAGE, "ModelGenerators"))
+            .addModifiers(Modifier.PUBLIC, Modifier.FINAL);
+
+    private void generateCanProvideFor(TypeSpec.Builder typeBuilder, String componentName) {
         var typeUsageTypeName = ClassName.get("net.jqwik.api.providers", "TypeUsage");
 
-        var componentName = kebabCaseToCamelCase(componentDir, true);
         var modelClassName = ClassName.get(MODEL_PACKAGE, componentName);
 
         var methodBuilder = MethodSpec.methodBuilder("canProvideFor")
@@ -47,7 +44,7 @@ public abstract class GenerateModelGenerators extends GovukComponentTask {
         typeBuilder.addMethod(methodBuilder.build());
     }
 
-    private void generateProvideFor(TypeSpec.Builder typeBuilder, String componentDir) {
+    private void generateProvideFor(TypeSpec.Builder typeBuilder, String componentName) {
         var methodBuilder = MethodSpec.methodBuilder("provideFor")
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC);
@@ -66,17 +63,16 @@ public abstract class GenerateModelGenerators extends GovukComponentTask {
 
         var collectionsTypeName = ClassName.get(Collections.class);
         var modelGenTypeName = ClassName.get(OUT_PACKAGE, "ModelGenerators");
-        var arbitraryMethodName = kebabCaseToCamelCase(componentDir, false);
+        var arbitraryMethodName = WordUtils.uncapitalize(componentName);
         methodBuilder.addStatement("return $T.singleton($T.$N())", collectionsTypeName, modelGenTypeName, arbitraryMethodName);
 
         typeBuilder.addMethod(methodBuilder.build());
     }
 
-    private void generateArbitraryProvider(List<ParameterSchema> params, String componentDir) throws IOException {
+    private void generateArbitraryProvider(List<ParameterSchema> params, String componentName) throws IOException {
         var srcDir = getGeneratedSourcesDir().get().getAsFile();
         var resourcesDir = getGeneratedResourcesDir().get().getAsFile();
 
-        var componentName = kebabCaseToCamelCase(componentDir, true);
         var className = ClassName.get(OUT_PACKAGE, componentName + "ArbitraryProvider");
         var arbitraryProviderClassName = ClassName.get("net.jqwik.api.providers", "ArbitraryProvider");
 
@@ -84,8 +80,8 @@ public abstract class GenerateModelGenerators extends GovukComponentTask {
                 .addSuperinterface(arbitraryProviderClassName)
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL);
 
-        generateCanProvideFor(typeBuilder, componentDir);
-        generateProvideFor(typeBuilder, componentDir);
+        generateCanProvideFor(typeBuilder, componentName);
+        generateProvideFor(typeBuilder, componentName);
 
         var typeSpec = typeBuilder.build();
 
@@ -108,7 +104,7 @@ public abstract class GenerateModelGenerators extends GovukComponentTask {
         var paramType = param.getType();
         var newline = System.lineSeparator();
         var genClassName = ClassName.get(OUT_PACKAGE, "ModelGenerators");
-        var builderClassName = ClassName.get(MODEL_PACKAGE, WordUtils.capitalize(componentName), "Builder");
+        var builderClassName = ClassName.get(MODEL_PACKAGE, componentName, "Builder");
         var arbitrariesClassName = ClassName.get("net.jqwik.api", "Arbitraries");
         var escapeClassName = ClassName.get("org.apache.commons.text", "StringEscapeUtils");
 
@@ -116,10 +112,14 @@ public abstract class GenerateModelGenerators extends GovukComponentTask {
         var hasParameters = !param.getParams().isEmpty();
 
         if (isComplexType && hasParameters) {
-            var methodName = getDeclarationName(componentName, param.getName());
+            var nestedModelName = getDeclarationName(componentName, param.getName());
+            var nestedModelMethodName = WordUtils.uncapitalize(nestedModelName);
             var useCode = "object".equals(paramType) ? ".use($T.$N())" : ".use($T.$N().list().ofMaxSize(5))";
-            codeBuilder.add(useCode, genClassName, methodName);
-            generateModelGenerator(modelGenBuilder, param.getParams(), methodName);
+            codeBuilder.add(useCode, genClassName, nestedModelMethodName);
+            generateModelGenerator(modelGenBuilder, param.getParams(), nestedModelName);
+        } else if (isComplexType && Optional.ofNullable(param.isComponent()).orElse(false)) {
+            var useCode = "object".equals(paramType) ? ".use($T.$N())" : ".use($T.$N().list().ofMaxSize(5))";
+            codeBuilder.add(useCode, genClassName, param.getName());
         } else if (isComplexType) {
             if ("object".equals(paramType)) {
                 codeBuilder.add(".use($T.maps($T.strings().alpha().ofMaxLength(10), $T.strings().ascii().ofMaxLength(20)).ofMaxSize(5))", arbitrariesClassName, arbitrariesClassName, arbitrariesClassName);
@@ -128,7 +128,7 @@ public abstract class GenerateModelGenerators extends GovukComponentTask {
             }
         } else if ("integer".equals(paramType)) {
             codeBuilder.add(".use($T.integers())", arbitrariesClassName);
-        } else if ("nunjucks-block".equals(paramType) || "html".equals(paramType) || ("string".equals(paramType) && "html".equals(paramName))) {
+        } else if ("nunjucks-block".equals(paramType) || "html".equals(paramType) || ("string".equals(paramType) && HTML_PATTERN.matcher(paramName).find())) {
             codeBuilder.add(".use($T.strings().ascii().ofMaxLength(20).map($T::escapeHtml4))", arbitrariesClassName, escapeClassName);
         } else if ("string".equals(paramType)) {
             codeBuilder.add(".use($T.strings().ascii().ofMaxLength(20))", arbitrariesClassName);
@@ -144,11 +144,13 @@ public abstract class GenerateModelGenerators extends GovukComponentTask {
     }
 
     private void generateModelGenerator(TypeSpec.Builder modelGenBuilder, List<ParameterSchema> params, String componentName) throws IOException {
-        var methodBuilder = MethodSpec.methodBuilder(componentName)
+        var methodName = WordUtils.uncapitalize(componentName);
+
+        var methodBuilder = MethodSpec.methodBuilder(methodName)
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
 
         var arbitraryTypeName = ClassName.get("net.jqwik.api", "Arbitrary");
-        var modelClassName = ClassName.get(MODEL_PACKAGE, WordUtils.capitalize(componentName));
+        var modelClassName = ClassName.get(MODEL_PACKAGE, WordUtils.capitalize(methodName));
         var arbitraryModelClassName = ParameterizedTypeName.get(arbitraryTypeName, modelClassName);
         methodBuilder.returns(arbitraryModelClassName);
 
@@ -162,7 +164,7 @@ public abstract class GenerateModelGenerators extends GovukComponentTask {
             generateParamGenerator(modelGenBuilder, codeBuilder, componentName, param);
         }
 
-        var builderClassName = ClassName.get(MODEL_PACKAGE, WordUtils.capitalize(componentName), "Builder");
+        var builderClassName = ClassName.get(MODEL_PACKAGE, componentName, "Builder");
         codeBuilder.add(".build($T::build)", builderClassName);
 
         methodBuilder.addStatement(codeBuilder.build());
@@ -170,34 +172,21 @@ public abstract class GenerateModelGenerators extends GovukComponentTask {
         modelGenBuilder.addMethod(methodBuilder.build());
     }
 
-    private void generateModelGenerator(TypeSpec.Builder modelGenBuilder, Path schemaPath) throws IOException {
-        try (var input = new FileInputStream(schemaPath.toFile())) {
-            var componentDir = schemaPath.getParent().getFileName().toString();
-            var componentSchema = yaml.<ComponentSchema>load(input);
-            preProcessSchema(componentSchema);
-            var methodName = kebabCaseToCamelCase(componentDir, false);
-            generateArbitraryProvider(componentSchema.getParams(), componentDir);
-            generateModelGenerator(modelGenBuilder, componentSchema.getParams(), methodName);
-        }
+    @Override
+    protected void generate(Map.Entry<String, ComponentSchema> component) throws IOException {
+        var componentName = component.getKey();
+        var params = component.getValue().getParams();
+        generateArbitraryProvider(params, componentName);
+        generateModelGenerator(modelGenBuilder, params, componentName);
     }
 
+
     @TaskAction
+    @Override
     public void generate() throws IOException {
+        super.generate();
         var srcDir = getGeneratedSourcesDir().get().getAsFile();
-
-        var componentsPath = getRepositoryDir().get().getAsFile().toPath()
-                .resolve("src").resolve("govuk").resolve("components");
-
-        var className = ClassName.get(OUT_PACKAGE, "ModelGenerators");
-
-        var typeBuilder = TypeSpec.classBuilder(className)
-                .addModifiers(Modifier.PUBLIC, Modifier.FINAL);
-
-        try (var files = Files.find(componentsPath, Integer.MAX_VALUE, this::isParameterSchema)) {
-            Streams.stream(files).forEach(component -> generateModelGenerator(typeBuilder, component));
-        }
-
-        var typeSpec = typeBuilder.build();
+        var typeSpec = modelGenBuilder.build();
         var paramsFile = JavaFile.builder(OUT_PACKAGE, typeSpec).build();
         paramsFile.writeTo(srcDir);
     }

@@ -1,31 +1,26 @@
 package com.opencastsoftware.gradle;
 
 import com.squareup.javapoet.*;
-import org.apache.commons.lang3.stream.Streams;
 import org.apache.commons.text.WordUtils;
 import org.gradle.api.file.DirectoryProperty;
-import org.gradle.api.tasks.InputDirectory;
 import org.gradle.api.tasks.OutputDirectory;
-import org.gradle.api.tasks.TaskAction;
 import org.xml.sax.SAXException;
 
 import javax.lang.model.element.Modifier;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.util.Map;
 
 public abstract class GenerateIntegrationTests extends GovukComponentTask {
-    @InputDirectory
-    abstract public DirectoryProperty getRepositoryDir();
 
     @OutputDirectory
     abstract public DirectoryProperty getGeneratedTestsDir();
 
-    private void generateIntegrationTest(String componentDir) throws IOException {
+    @Override
+    protected void generate(Map.Entry<String, ComponentSchema> component) throws IOException {
         var srcDir = getGeneratedTestsDir().get().getAsFile();
 
-        var componentName = kebabCaseToCamelCase(componentDir);
+        var componentName = component.getKey();
         var modelClassName = ClassName.get(MODEL_PACKAGE, componentName);
         var testClassName = ClassName.get(MODEL_PACKAGE, modelClassName.simpleName() + "Test");
         var superClassName = ClassName.get(MODEL_PACKAGE, "ComponentTest");
@@ -43,7 +38,7 @@ public abstract class GenerateIntegrationTests extends GovukComponentTask {
         typeBuilder.addMethod(MethodSpec.constructorBuilder()
                 .addException(ClassName.get(IOException.class))
                 .addException(ClassName.get(ParserConfigurationException.class))
-                .addStatement("super($S)", componentDir)
+                .addStatement("super($S)", component.getValue().getKebabCaseName())
                 .build());
 
         var propertyParamName = WordUtils.uncapitalize(componentName);
@@ -75,20 +70,5 @@ public abstract class GenerateIntegrationTests extends GovukComponentTask {
                 .build();
 
         testFile.writeTo(srcDir);
-    }
-
-    private void generateIntegrationTest(Path schemaPath) throws IOException {
-        var componentDir = schemaPath.getParent().getFileName().toString();
-        generateIntegrationTest(componentDir);
-    }
-
-    @TaskAction
-    public void generate() throws IOException {
-        var componentsPath = getRepositoryDir().getAsFile().get().toPath()
-                .resolve("src").resolve("govuk").resolve("components");
-
-        try (var files = Files.find(componentsPath, Integer.MAX_VALUE, this::isParameterSchema)) {
-            Streams.stream(files).forEach(this::generateIntegrationTest);
-        }
     }
 }
