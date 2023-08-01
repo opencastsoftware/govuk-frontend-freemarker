@@ -44,7 +44,7 @@ public abstract class GenerateIntegrationTests extends GovukComponentTask {
         var propertyParamName = WordUtils.uncapitalize(componentName);
 
         typeBuilder.addMethod(MethodSpec.methodBuilder("shouldRender")
-                .addAnnotation(propertyClassName)
+                .addAnnotation(AnnotationSpec.builder(propertyClassName).addMember("tries", (System.getenv("CI") != null ? "1000" : "100")).build())
                 .addException(IOException.class)
                 .addException(InterruptedException.class)
                 .addException(SAXException.class)
