@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText:  © 2023 Opencast Software Europe Ltd <https://opencastsoftware.com>
+ * SPDX-FileCopyrightText:  © 2023-2024 Opencast Software Europe Ltd <https://opencastsoftware.com>
  * SPDX-License-Identifier: MIT
  */
 package com.opencastsoftware.govuk.freemarker;
@@ -41,15 +41,13 @@ public abstract class ComponentTest<A> {
     protected final Template template;
     protected final HttpClient http = HttpClient.newHttpClient();
     protected final ObjectMapper objectMapper = new ObjectMapper();
-    protected final DocumentBuilder docBuilder = XMLUnit.newControlParser();
+    protected final DocumentBuilder docBuilder = XMLUnit.newTestParser();
     protected final TolerantSaxDocumentBuilder saxBuilder = new TolerantSaxDocumentBuilder(docBuilder);
     protected final HTMLDocumentBuilder htmlBuilder = new HTMLDocumentBuilder(saxBuilder);
 
     protected Configuration templateConfiguration() {
         return new Configuration(Configuration.VERSION_2_3_32);
     }
-
-    ;
 
     protected HttpRequest.Builder requestBuilder() {
         return HttpRequest
@@ -86,6 +84,8 @@ public abstract class ComponentTest<A> {
 
         var paramsJson = objectMapper.writeValueAsString(params);
 
+        // System.err.println(paramsJson);
+
         var postBody = HttpRequest.BodyPublishers.ofString(paramsJson);
 
         var response = http.send(
@@ -97,6 +97,9 @@ public abstract class ComponentTest<A> {
             fail("Failed to render Nunjucks template:\n\n" + response.body() + "\n\n" + "Using params:\n\n" + paramsJson);
         }
 
+        // System.err.println("Nunjucks:");
+        // System.err.println(response.body());
+
         return htmlBuilder.parse(response.body());
     }
 
@@ -104,8 +107,13 @@ public abstract class ComponentTest<A> {
         var stringWriter = new StringWriter();
 
         try (var bufWriter = new BufferedWriter(stringWriter)) {
+            // make sure that we don't cache templates for different versions of GOV.UK Frontend
+            config.clearTemplateCache();
             template.process(Params.of(dataModel), bufWriter);
         }
+
+        // System.err.println("FreeMarker:");
+        // System.err.println(stringWriter);
 
         return htmlBuilder.parse(stringWriter.toString());
     }

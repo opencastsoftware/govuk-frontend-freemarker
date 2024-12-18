@@ -140,6 +140,9 @@ govukFrontendVersions.forEach { (version, tagName) ->
                     implementation(libs.xmlUnitMatchers)
                     implementation(libs.jsr305)
                     implementation(libs.apacheCommonsText)
+                    // Can be used to enable Freemarker logging in the tests
+                    // runtimeOnly(libs.log4jOverSlf4j)
+                    // runtimeOnly(libs.logbackClassic)
                 }
 
                 targets {

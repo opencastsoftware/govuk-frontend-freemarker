@@ -67,6 +67,6 @@ jobs:
 
     services:
       nunjucks-renderer:
-        image: ghcr.io/opencastsoftware/govuk-nunjucks-renderer:0.1.2
+        image: ghcr.io/opencastsoftware/govuk-nunjucks-renderer:0.1.3
         ports:
           - 3000:3000

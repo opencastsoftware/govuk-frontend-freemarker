@@ -19,14 +19,14 @@
   </svg>
     </#local>
     <#local classNames=classNames + " govuk-button--start">
-  </#if><#local commonAttributes> class="${classNames}" data-module="govuk-button"<#list params.attributes!{} as attribute, value> ${attribute}="${value}"</#list><#if (params.id)?has_content> id="${params.id}"</#if></#local><#local buttonAttributes><#if (params.name)?has_content> name="${params.name}"</#if><#if (params.disabled)?? && params.disabled> disabled="disabled" aria-disabled="true"</#if><#if (params.preventDoubleClick)??> data-prevent-double-click="${params.preventDoubleClick}"</#if></#local><#if (element == "a")??>
-  <a href="${((params.href)?has_content)?then(params.href, "#")}" role="button" draggable="false"${commonAttributes?markup_string?no_esc}>
-    ${((params.html)?has_content)?then(params.html?no_esc, params.text)}
-  ${((iconHtml)?has_content)?then(iconHtml?markup_string?no_esc?trim, "")}</a><#elseif (element == "button")??>
-  <button<#if (params.value)?has_content> value="${params.value}"</#if><#if (params.type)?has_content> type="${params.type}"</#if>${buttonAttributes?markup_string?no_esc}${commonAttributes?markup_string?no_esc}>
-    ${((params.html)?has_content)?then(params.html?no_esc, params.text)}
-  ${((iconHtml)?has_content)?then(iconHtml?markup_string?no_esc?trim, "")}</button><#elseif (element == "input")??>
-  <input value="${params.text}" type="${((params.type)?has_content)?then(params.type, "submit")}"${buttonAttributes?markup_string?no_esc}${commonAttributes?markup_string?no_esc}></#if>
+  </#if><#local commonAttributes> class="${(classNames)!}" data-module="govuk-button"<#list params.attributes!{} as attribute, value> ${(attribute)!}="${(value)!}"</#list><#if (params.id)?has_content> id="${(params.id)!}"</#if></#local><#local buttonAttributes><#if (params.name)?has_content> name="${(params.name)!}"</#if><#if (params.disabled)?? && params.disabled> disabled="disabled" aria-disabled="true"</#if><#if (params.preventDoubleClick)??> data-prevent-double-click="${(params.preventDoubleClick)!false}"</#if></#local><#if (element)! == "a">
+  <a href="${((params.href)?has_content)?then((params.href)!, "#")}" role="button" draggable="false"${commonAttributes?no_esc}>
+    ${((params.html)?has_content)?then(params.html?no_esc, (params.text)!)}
+  ${((iconHtml)?has_content)?then(iconHtml?markup_string?trim?no_esc, "")}</a><#elseif (element)! == "button">
+  <button<#if (params.value)?has_content> value="${(params.value)!}"</#if><#if (params.type)?has_content> type="${(params.type)!}"</#if>${buttonAttributes?no_esc}${commonAttributes?no_esc}>
+    ${((params.html)?has_content)?then(params.html?no_esc, (params.text)!)}
+  ${((iconHtml)?has_content)?then(iconHtml?markup_string?trim?no_esc, "")}</button><#elseif (element)! == "input">
+  <input value="${(params.text)!}" type="${((params.type)?has_content)?then((params.type)!, "submit")}"${buttonAttributes?no_esc}${commonAttributes?no_esc}></#if>
   
 </#macro>
 

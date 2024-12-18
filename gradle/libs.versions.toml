@@ -14,6 +14,8 @@ jqwik = "1.7.3"
 jsoup = "1.16.1"
 jsr305 = "3.0.2"
 junit = "5.9.3"
+log4j = "2.0.16"
+logback = "1.5.12"
 snakeYaml = "2.0"
 toStringVerifier = "1.4.8"
 xmlUnit = "2.9.1"
@@ -30,6 +32,8 @@ jqwik = { module = "net.jqwik:jqwik", version.ref = "jqwik" }
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
 jsr305 = { module = "com.google.code.findbugs:jsr305", version.ref = "jsr305" }
 junitJupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
+log4jOverSlf4j = { module = "org.slf4j:log4j-over-slf4j", version.ref = "log4j" }
+logbackClassic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 toStringVerifier = { module = "com.jparams:to-string-verifier", version.ref = "toStringVerifier" }
 gradleNodePlugin = { module = "com.github.node-gradle:gradle-node-plugin", version.ref = "gradleNode" }
 grgitCore = { module = "org.ajoberstar.grgit:grgit-core", version.ref = "grgit" }

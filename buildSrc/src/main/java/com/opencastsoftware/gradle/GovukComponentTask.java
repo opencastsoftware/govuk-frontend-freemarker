@@ -22,6 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public abstract class GovukComponentTask extends DefaultTask {
@@ -33,6 +34,9 @@ public abstract class GovukComponentTask extends DefaultTask {
     protected final String MODEL_PACKAGE = "com.opencastsoftware.govuk.freemarker";
 
     protected final Map<String, ComponentSchema> componentSchemas = new HashMap<>();
+
+    protected final Pattern HTML_PROP = Pattern.compile("\\b(?:\\w*)[Hh]tml$");
+    protected final Pattern TEXT_PROP = Pattern.compile("\\b(?!Limit)(?:\\w*)[Tt]ext$");
 
     public GovukComponentTask() {
         var representer = new Representer(new DumperOptions());
@@ -69,7 +73,12 @@ public abstract class GovukComponentTask extends DefaultTask {
         if ("array".equals(paramType)) {
             var listName = ClassName.get(List.class);
             var elemTypeName = param.getParams().isEmpty() ? ClassName.get(String.class) : getClassName(componentName, param.getName());
-            return ParameterizedTypeName.get(listName, elemTypeName);
+            // Work around the undeclared nested array in the table component
+            if ("Table".equals(componentName) && "rows".equals(param.getName())) {
+                return ParameterizedTypeName.get(listName, ParameterizedTypeName.get(listName, elemTypeName));
+            } else {
+                return ParameterizedTypeName.get(listName, elemTypeName);
+            }
         } else if ("object".equals(paramType) && Optional.ofNullable(param.isComponent()).orElse(false)) {
             return ClassName.get(MODEL_PACKAGE, WordUtils.capitalize(param.getName()));
         } else if ("object".equals(paramType)) {
@@ -96,6 +105,15 @@ public abstract class GovukComponentTask extends DefaultTask {
         if (params.isEmpty()) {
             return params;
         }
+
+        // Work around for mutually exclusive text & html properties both being `required`
+        params.forEach(param -> {
+            var htmlProp = HTML_PROP.matcher(param.getName());
+            var textProp = TEXT_PROP.matcher(param.getName());
+            if (htmlProp.matches() || textProp.matches()) {
+                param.setRequired(false);
+            }
+        });
 
         var groupedParams = params.stream()
                 .filter(param -> !"caller".equals(param.getName()))
