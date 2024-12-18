@@ -28,6 +28,17 @@ Maven (pom.xml):
 </dependency>
 ```
 
+## Known Issues
+
+There are no known functional issues with these translated templates. If you find some, please report them on the Issues tab!
+
+The main issue with this translation at present is its readability:
+
+* These templates were translated using Nunjucks' own parser. This means that Nunjucks' [whitespace stripping](https://mozilla.github.io/nunjucks/templating.html#whitespace-control) has been applied to the resulting templates.
+* No effort has been made as yet to print the translation with minimal parentheses. This means that parentheses are used in all cases where a compound expression could be used.
+
+We plan to address these issues in later releases of the [govuk-frontend-transformer](https://github.com/opencastsoftware/govuk-frontend-transformer) project. 
+
 ## Usage
 
 Templates can be found as resources in the `com.opencastsoftware.govuk.freemarker.components` package.
@@ -147,7 +158,7 @@ To build and run tests:
 ./gradlew build --info
 ```
 
-## Acknowlegements
+## Acknowledgements
 
 This project wouldn't exist without the work of the GOV.UK Design System and GOV.UK Frontend contributors.
 
