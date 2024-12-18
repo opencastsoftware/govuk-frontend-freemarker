@@ -5,6 +5,8 @@
 
 This repository contains [Apache FreeMarker](https://freemarker.apache.org/) templates for the [GOV.UK Design System](https://design-system.service.gov.uk/) components.
 
+At present this repository is tracking version 4.x of the GOV.UK Frontend library, but work is ongoing to accomodate the major changes in version 5.x of GOV.UK Frontend.
+
 These templates have been translated from the original [Nunjucks](https://mozilla.github.io/nunjucks/) using the [govuk-frontend-transformer](https://github.com/opencastsoftware/govuk-frontend-transformer) project.
 
 ## Installation
@@ -14,7 +16,7 @@ These templates have been translated from the original [Nunjucks](https://mozill
 Gradle (build.gradle / build.gradle.kts):
 
 ```kotlin
-implementation("com.opencastsoftware:govuk-frontend-freemarker:0.1.0:govukFrontend460")
+implementation("com.opencastsoftware:govuk-frontend-freemarker:0.1.0:govukFrontend4x")
 ```
 
 Maven (pom.xml):
@@ -24,7 +26,7 @@ Maven (pom.xml):
     <groupId>com.opencastsoftware</groupId>
     <artifactId>govuk-frontend-freemarker</artifactId>
     <version>0.1.0</version>
-    <classifier>govukFrontend460</classifier>
+    <classifier>govukFrontend4x</classifier>
 </dependency>
 ```
 

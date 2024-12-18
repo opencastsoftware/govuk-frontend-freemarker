@@ -8,8 +8,11 @@ import org.apache.commons.text.CaseUtils;
 import org.apache.commons.text.WordUtils;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.file.DirectoryProperty;
+import org.gradle.api.provider.Property;
+import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.InputDirectory;
 import org.gradle.api.tasks.TaskAction;
+import org.gradle.util.internal.VersionNumber;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
@@ -26,6 +29,9 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public abstract class GovukComponentTask extends DefaultTask {
+    @Input
+    abstract public Property<String> getGovukFrontendVersion();
+
     @InputDirectory
     abstract public DirectoryProperty getRepositoryDir();
 
@@ -183,8 +189,17 @@ public abstract class GovukComponentTask extends DefaultTask {
 
     @TaskAction
     public void generate() throws IOException {
-        var componentsPath = getRepositoryDir().getAsFile().get().toPath()
-                .resolve("src").resolve("govuk").resolve("components");
+        var majorVersion5x = VersionNumber.parse("5.0.0");
+        var currentVersion = VersionNumber.parse(getGovukFrontendVersion().get().substring(1));
+        var is5xOrAbove = currentVersion.compareTo(majorVersion5x) >= 0;
+
+        var repositoryPath = getRepositoryDir().getAsFile().get().toPath();
+
+        var basePath = is5xOrAbove
+                ? repositoryPath.resolve("packages").resolve("govuk-frontend")
+                : repositoryPath;
+
+        var componentsPath = basePath.resolve("src").resolve("govuk").resolve("components");
 
         // We need to read all schemas so that they can be cross-referenced later
         try (var files = Files.find(componentsPath, Integer.MAX_VALUE, this::isParameterSchema)) {

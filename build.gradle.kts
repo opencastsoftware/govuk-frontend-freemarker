@@ -61,7 +61,7 @@ testing {
     }
 }
 
-val govukFrontendVersions = mapOf("govukFrontend460" to "v4.6.0", "govukFrontend450" to "v4.5.0")
+val govukFrontendVersions = mapOf("govukFrontend4x" to "v4.9.0", "govukFrontend5x" to "v5.7.1")
 
 govukFrontendVersions.forEach { (version, tagName) ->
     val cloneRepoDir = "${buildDir}/generated/${version}/gitRepo"
@@ -77,6 +77,7 @@ govukFrontendVersions.forEach { (version, tagName) ->
         val generateModelClassesTaskName = "generate${version.capitalized()}Models"
         val generateModelClassesTask =
             tasks.register<GenerateModelClasses>(generateModelClassesTaskName) {
+                govukFrontendVersion.set(tagName)
                 repositoryDir.set(cloneRepoTask.map { it.repositoryDir.get() })
                 generatedSourcesDir.set(file(generatedSrcDir))
             }
@@ -104,6 +105,7 @@ govukFrontendVersions.forEach { (version, tagName) ->
                 val generatedTestResourceDir = "${buildDir}/generated/${suiteName}/resources"
                 val generateModelGeneratorsTask =
                     tasks.register<GenerateModelGenerators>(generateModelGeneratorsTaskName) {
+                        govukFrontendVersion.set(tagName)
                         repositoryDir.set(cloneRepoTask.map { it.repositoryDir.get() })
                         generatedSourcesDir.set(file(generatedTestSrcDir))
                         generatedResourcesDir.set(file(generatedTestResourceDir))
@@ -112,6 +114,7 @@ govukFrontendVersions.forEach { (version, tagName) ->
                 val generateIntegrationTestsTaskName = "generate${version.capitalized()}Tests"
                 val generateIntegrationTestsTask =
                     tasks.register<GenerateIntegrationTests>(generateIntegrationTestsTaskName) {
+                        govukFrontendVersion.set(tagName)
                         repositoryDir.set(cloneRepoTask.map { it.repositoryDir.get() })
                         generatedTestsDir.set(file(generatedTestSrcDir))
                     }

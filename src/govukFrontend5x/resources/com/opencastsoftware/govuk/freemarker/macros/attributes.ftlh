@@ -1,0 +1,5 @@
+<#macro govukAttributesMacro attributes><#local caller><#nested/></#local><#local attributesHtml=((attributes)?is_string)?then(attributes, "")><#if (attributes)?is_hash>     <#list attributes![] as name, value><#if (value)?is_hash && !(((value.val)??)??) && ((value)?? && (value)?size gt 0)>         <#local value=value.val>       </#if><#local options=((value)?is_hash)?then(value, { "optional": false } + ((value)??)?then({ "value": value }, {}))><#if options.optional == true && options.value == true>         <#local attributesHtml=attributesHtml + " " + name><#elseif (options.optional == true && !(((options.value)??)??)) || options.optional != true>         <#local attributesHtml=attributesHtml + " " + name + '="' + options.value + '"'>       </#if>     </#list>   </#if>${attributesHtml?no_esc}</#macro>
+<#function govukAttributes attributes>
+  <#local result><@govukAttributesMacro attributes=attributes/></#local>
+  <#return result>
+</#function>

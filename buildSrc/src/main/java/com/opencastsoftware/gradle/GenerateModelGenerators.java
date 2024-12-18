@@ -109,7 +109,10 @@ public abstract class GenerateModelGenerators extends GovukComponentTask {
         var isComplexType = "object".equals(paramType) || "array".equals(paramType);
         var hasParameters = !param.getParams().isEmpty();
 
-        if (isComplexType && hasParameters) {
+        if (isComplexType && Optional.ofNullable(param.isComponent()).orElse(false)) {
+            var useCode = "object".equals(paramType) ? ".use($T.$N())" : ".use($T.$N().list().ofMaxSize(5))";
+            codeBuilder.add(useCode, genClassName, param.getName());
+        } else if (isComplexType && hasParameters) {
             var nestedModelName = getDeclarationName(componentName, param.getName());
             var nestedModelMethodName = WordUtils.uncapitalize(nestedModelName);
             var useCode = "object".equals(paramType) ? ".use($T.$N())" : ".use($T.$N().list().ofMaxSize(5))";
@@ -121,9 +124,6 @@ public abstract class GenerateModelGenerators extends GovukComponentTask {
             }
             codeBuilder.add(useCode, genClassName, nestedModelMethodName);
             generateModelGenerator(modelGenBuilder, param.getParams(), nestedModelName);
-        } else if (isComplexType && Optional.ofNullable(param.isComponent()).orElse(false)) {
-            var useCode = "object".equals(paramType) ? ".use($T.$N())" : ".use($T.$N().list().ofMaxSize(5))";
-            codeBuilder.add(useCode, genClassName, param.getName());
         } else if (isComplexType) {
             if ("object".equals(paramType)) {
                 codeBuilder.add(".use($T.maps($T.attributeNames, $T.strings).ofMaxSize(5))", arbitrariesClassName, genClassName, genClassName);
