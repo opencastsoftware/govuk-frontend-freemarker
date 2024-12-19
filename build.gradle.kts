@@ -85,7 +85,7 @@ govukFrontendVersions.forEach { (version, tagName) ->
 
         sourceSets.create(version) {
             tasks[compileJavaTaskName].dependsOn(generateModelClassesTask.get())
-            java { srcDirs(generatedSrcDir) }
+            java { srcDirs(generateModelClassesTask.flatMap { it.generatedSourcesDir }) }
             dependencies {
                 "${version}Implementation"(libs.jsr305)
                 "${version}Implementation"(sourceSets["main"].output)
@@ -93,7 +93,13 @@ govukFrontendVersions.forEach { (version, tagName) ->
         }
     }
 
-    java { registerFeature(version) { usingSourceSet(sourceSets[version]) } }
+    java {
+        registerFeature(version) {
+            usingSourceSet(sourceSets[version])
+            withJavadocJar()
+            withSourcesJar()
+        }
+    }
 
     val suiteName = "test${version.capitalized()}"
 
