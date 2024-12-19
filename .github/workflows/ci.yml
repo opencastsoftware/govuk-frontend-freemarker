@@ -7,8 +7,9 @@ on:
 env:
   ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.SONATYPE_USERNAME }}
   ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.SONATYPE_PASSWORD }}
-  ORG_GRADLE_PROJECT_signingKey: ${{ secrets.PGP_SECRET }}
-  ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.PGP_PASSPHRASE }}
+  ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.PGP_SECRET }}
+  ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.PGP_KEY_ID }}
+  ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.PGP_PASSPHRASE }}
 
 permissions:
   contents: read
@@ -24,9 +25,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Validate Gradle Wrapper
-        uses: gradle/wrapper-validation-action@v1
-
       - name: Download Java JDK
         uses: typelevel/download-java@v2
         id: download-java
@@ -41,16 +39,16 @@ jobs:
           java-version: 11
           jdkFile: ${{ steps.download-java.outputs.jdkFile }}
 
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
       - name: Build & Test
-        uses: gradle/gradle-build-action@v2.4.2
-        with:
-          arguments: build --info
+        run: ./gradlew build --info
 
       - name: Upload Coverage Report
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          verbose: true
 
       - name: Publish Test Results
         uses: actions/upload-artifact@v3
@@ -61,9 +59,8 @@ jobs:
 
       - name: Publish To Sonatype
         if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main')
-        uses: gradle/gradle-build-action@v2.4.2
-        with:
-          arguments: publishAllPublicationsToMavenCentral
+        run: ./gradlew publishAllPublicationsToMavenCentral
+
 
     services:
       nunjucks-renderer:
