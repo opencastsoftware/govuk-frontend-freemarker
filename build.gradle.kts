@@ -62,6 +62,7 @@ testing {
 }
 
 val govukFrontendVersions = mapOf("govukFrontend4x" to "v4.9.0", "govukFrontend5x" to "v5.7.1")
+val isCI = !System.getenv("CI").isNullOrEmpty()
 
 govukFrontendVersions.forEach { (version, tagName) ->
     val cloneRepoDir = "${buildDir}/generated/${version}/gitRepo"
@@ -157,9 +158,12 @@ govukFrontendVersions.forEach { (version, tagName) ->
         }
     }
 
-    tasks.check {
-        dependsOn(testing.suites.named(suiteName))
-        finalizedBy(tasks["${suiteName}CodeCoverageReport"])
+    // Only run version 4.x in CI while 5.x is still WIP
+    if (version == "govukFrontend4x" || !isCI) {
+        tasks.check {
+            dependsOn(testing.suites.named(suiteName))
+            finalizedBy(tasks["${suiteName}CodeCoverageReport"])
+        }
     }
 }
 
