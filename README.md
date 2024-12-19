@@ -5,7 +5,7 @@
 
 This repository contains [Apache FreeMarker](https://freemarker.apache.org/) templates for the [GOV.UK Design System](https://design-system.service.gov.uk/) components.
 
-At present this repository is tracking version 4.x of the GOV.UK Frontend library, but work is ongoing to translate version 5.x of GOV.UK Frontend.
+At present this repository is tracking version 4.x of the [GOV.UK Frontend](https://github.com/alphagov/govuk-frontend) library, but work is ongoing to translate version 5.x of GOV.UK Frontend.
 
 ## Installation
 
