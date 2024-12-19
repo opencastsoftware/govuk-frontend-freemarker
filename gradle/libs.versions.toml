@@ -1,7 +1,7 @@
 [versions]
 apacheCommonsLang = "3.12.0"
 apacheCommonsText = "1.10.0"
-equalsVerifier = "3.14.1"
+equalsVerifier = "3.17.5"
 freemarker = "2.3.32"
 gradleNode = "4.0.0"
 gradleJavaConventions = "0.1.3"
