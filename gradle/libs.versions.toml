@@ -1,5 +1,5 @@
 [versions]
-apacheCommonsLang = "3.12.0"
+apacheCommonsLang = "3.17.0"
 apacheCommonsText = "1.10.0"
 equalsVerifier = "3.17.5"
 freemarker = "2.3.32"
