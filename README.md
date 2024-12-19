@@ -36,7 +36,8 @@ There are no known functional issues with these translated templates. If you fin
 
 The main issue with this translation at present is its readability:
 
-* These templates were translated using Nunjucks' own parser. This means that Nunjucks' [whitespace stripping](https://mozilla.github.io/nunjucks/templating.html#whitespace-control) has been applied to the resulting templates.
+* These templates were translated using Nunjucks' own parser. This means that [whitespace stripping](https://mozilla.github.io/nunjucks/templating.html#whitespace-control) that would normally be applied to the template output has been applied to the templates themselves, removing linebreaks and whitespace that were added for readability.
+* Comments are missing from the translation, because the Nunjucks parser discards comments.
 * No effort has been made as yet to print the translation with minimal parentheses. This means that parentheses are used in all cases where a compound expression could be used.
 
 We plan to address these issues in later releases of the [govuk-frontend-transformer](https://github.com/opencastsoftware/govuk-frontend-transformer) project. 
