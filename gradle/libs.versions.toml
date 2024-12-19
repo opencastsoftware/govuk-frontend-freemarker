@@ -2,7 +2,7 @@
 apacheCommonsLang = "3.17.0"
 apacheCommonsText = "1.13.0"
 equalsVerifier = "3.17.5"
-freemarker = "2.3.32"
+freemarker = "2.3.33"
 gradleNode = "7.1.0"
 gradleJavaConventions = "0.1.4"
 grgit = "5.3.0"
