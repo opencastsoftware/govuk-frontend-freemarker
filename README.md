@@ -5,13 +5,15 @@
 
 This repository contains [Apache FreeMarker](https://freemarker.apache.org/) templates for the [GOV.UK Design System](https://design-system.service.gov.uk/) components.
 
-At present this repository is tracking version 4.x of the GOV.UK Frontend library, but work is ongoing to accomodate the major changes in version 5.x of GOV.UK Frontend.
-
-These templates have been translated from the original [Nunjucks](https://mozilla.github.io/nunjucks/) using the [govuk-frontend-transformer](https://github.com/opencastsoftware/govuk-frontend-transformer) project.
+At present this repository is tracking version 4.x of the GOV.UK Frontend library, but work is ongoing to translate version 5.x of GOV.UK Frontend.
 
 ## Installation
 
 *govuk-frontend-freemarker* is published for Java 11 and above.
+
+A [Maven classifier](https://maven.apache.org/pom.html#Dependencies) is used to select the GOV.UK Frontend major version.
+
+At present only the `govuk-frontend4x` artifacts are recommended, as the translation of GOV.UK Frontend 5.x is still a work in progress.
 
 Gradle (build.gradle / build.gradle.kts):
 
@@ -40,7 +42,7 @@ The main issue with this translation at present is its readability:
 * Comments are missing from the translation, because the Nunjucks parser discards comments.
 * No effort has been made as yet to print the translation with minimal parentheses. This means that parentheses are used in all cases where a compound expression could be used.
 
-We plan to address these issues in later releases of the [govuk-frontend-transformer](https://github.com/opencastsoftware/govuk-frontend-transformer) project. 
+We plan to address these issues in later releases of the project. 
 
 ## Usage
 
@@ -148,9 +150,9 @@ To run it:
 
 ```bash
 # Docker
-docker run -d -p 3000:3000 ghcr.io/opencastsoftware/govuk-nunjucks-renderer:0.1.0 
+docker run -d -p 3000:3000 ghcr.io/opencastsoftware/govuk-nunjucks-renderer:0.1.5
 # Podman
-podman run -d -p 3000:3000 ghcr.io/opencastsoftware/govuk-nunjucks-renderer:0.1.0 
+podman run -d -p 3000:3000 ghcr.io/opencastsoftware/govuk-nunjucks-renderer:0.1.5
 ```
 
 ### Building
