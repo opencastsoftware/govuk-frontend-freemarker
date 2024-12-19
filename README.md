@@ -1,6 +1,6 @@
 # govuk-frontend-freemarker
 
-[![CI](https://github.com/opencastsoftware/govuk-frontend-freemarker/actions/workflows/ci.yml/badge.svg)](https://github.com/opencastsoftware/govuk-frontend-freemarker/actions/workflows/ci.yml)
+[![CI](https://github.com/opencastsoftware/govuk-frontend-freemarker/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/opencastsoftware/govuk-frontend-freemarker/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-MIT-blue)](https://spdx.org/licenses/MIT.html)
 
 This repository contains [Apache FreeMarker](https://freemarker.apache.org/) templates for the [GOV.UK Design System](https://design-system.service.gov.uk/) components.
