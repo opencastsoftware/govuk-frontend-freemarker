@@ -16,7 +16,7 @@ These templates have been translated from the original [Nunjucks](https://mozill
 Gradle (build.gradle / build.gradle.kts):
 
 ```kotlin
-implementation("com.opencastsoftware:govuk-frontend-freemarker:0.1.0:govukFrontend4x")
+implementation("com.opencastsoftware:govuk-frontend-freemarker:0.1.0:govuk-frontend4x")
 ```
 
 Maven (pom.xml):
@@ -26,7 +26,7 @@ Maven (pom.xml):
     <groupId>com.opencastsoftware</groupId>
     <artifactId>govuk-frontend-freemarker</artifactId>
     <version>0.1.0</version>
-    <classifier>govukFrontend4x</classifier>
+    <classifier>govuk-frontend4x</classifier>
 </dependency>
 ```
 
