@@ -18,7 +18,7 @@ At present only the `govuk-frontend4x` artifacts are recommended, as the transla
 Gradle (build.gradle / build.gradle.kts):
 
 ```kotlin
-implementation("com.opencastsoftware:govuk-frontend-freemarker:0.1.0:govuk-frontend4x")
+implementation("com.opencastsoftware:govuk-frontend-freemarker:0.1.1:govuk-frontend4x")
 ```
 
 Maven (pom.xml):
@@ -27,7 +27,7 @@ Maven (pom.xml):
 <dependency>
     <groupId>com.opencastsoftware</groupId>
     <artifactId>govuk-frontend-freemarker</artifactId>
-    <version>0.1.0</version>
+    <version>0.1.1</version>
     <classifier>govuk-frontend4x</classifier>
 </dependency>
 ```
