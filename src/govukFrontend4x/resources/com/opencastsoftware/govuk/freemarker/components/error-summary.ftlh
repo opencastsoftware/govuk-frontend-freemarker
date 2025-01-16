@@ -1,6 +1,6 @@
 <#macro govukErrorSummaryMacro params>
   <#local caller><#nested/></#local>
-  <div class="govuk-error-summary<#if (params.classes)?has_content> ${(params.classes)!}</#if>"<#if (params.disableAutoFocus)??> data-disable-auto-focus="${(params.disableAutoFocus)!false}"</#if><#list params.attributes!{} as attribute, value> ${(attribute)!}="${(value)!}"</#list> data-module="govuk-error-summary">
+  <div class="govuk-error-summary<#if (params.classes)?has_content> ${(params.classes)!}</#if>"<#if (params.disableAutoFocus)??> data-disable-auto-focus="${((params.disableAutoFocus)!false)}"</#if><#list params.attributes!{} as attribute, value> ${attribute}="${((value)!{})}"</#list> data-module="govuk-error-summary">
     
     <div role="alert">
       <h2 class="govuk-error-summary__title">
@@ -16,7 +16,7 @@
           <#list params.errorList as item>
             <li>
             <#if (item.href)?has_content>
-              <a href="${(item.href)!}"<#list item.attributes!{} as attribute, value> ${(attribute)!}="${(value)!}"</#list>>${((item.html)?has_content)?then(item.html?no_esc, (item.text)!)}</a>
+              <a href="${(item.href)!}"<#list item.attributes!{} as attribute, value> ${attribute}="${((value)!{})}"</#list>>${((item.html)?has_content)?then(item.html?no_esc, (item.text)!)}</a>
             <#else>
               ${((item.html)?has_content)?then(item.html?no_esc, (item.text)!)}
             </#if>

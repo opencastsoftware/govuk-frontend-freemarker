@@ -5,7 +5,7 @@
 
 This repository contains [Apache FreeMarker](https://freemarker.apache.org/) templates for the [GOV.UK Design System](https://design-system.service.gov.uk/) components.
 
-At present this repository is tracking version 4.x of the [GOV.UK Frontend](https://github.com/alphagov/govuk-frontend) library, but work is ongoing to translate version 5.x of GOV.UK Frontend.
+At present this repository is tracking the last two major versions of the [GOV.UK Frontend](https://github.com/alphagov/govuk-frontend) library.
 
 ## Installation
 
@@ -13,12 +13,12 @@ At present this repository is tracking version 4.x of the [GOV.UK Frontend](http
 
 A [Maven classifier](https://maven.apache.org/pom.html#Dependencies) is used to select the GOV.UK Frontend major version.
 
-At present only the `govuk-frontend4x` artifacts are recommended, as the translation of GOV.UK Frontend 5.x is still a work in progress.
+### GOV.UK Frontend 5.x
 
 Gradle (build.gradle / build.gradle.kts):
 
 ```kotlin
-implementation("com.opencastsoftware:govuk-frontend-freemarker:0.1.1:govuk-frontend4x")
+implementation("com.opencastsoftware:govuk-frontend-freemarker:0.1.2:govuk-frontend5x")
 ```
 
 Maven (pom.xml):
@@ -27,7 +27,26 @@ Maven (pom.xml):
 <dependency>
     <groupId>com.opencastsoftware</groupId>
     <artifactId>govuk-frontend-freemarker</artifactId>
-    <version>0.1.1</version>
+    <version>0.1.2</version>
+    <classifier>govuk-frontend5x</classifier>
+</dependency>
+```
+
+### GOV.UK Frontend 4.x
+
+Gradle (build.gradle / build.gradle.kts):
+
+```kotlin
+implementation("com.opencastsoftware:govuk-frontend-freemarker:0.1.2:govuk-frontend4x")
+```
+
+Maven (pom.xml):
+
+```
+<dependency>
+    <groupId>com.opencastsoftware</groupId>
+    <artifactId>govuk-frontend-freemarker</artifactId>
+    <version>0.1.2</version>
     <classifier>govuk-frontend4x</classifier>
 </dependency>
 ```

@@ -1,5 +1,5 @@
 <#macro govukFooterMacro params>
-  <#import "../macros/attributes.ftlh" as attributes><footer class="govuk-footer<#if (params.classes)?has_content> ${(params.classes)!}</#if>"${attributes.govukAttributes(params.attributes)}>
+  <#import "../macros/attributes.ftlh" as attributes><footer class="govuk-footer<#if (params.classes)?has_content> ${(params.classes)!}</#if>"${attributes.govukAttributes(((params.attributes)!{}))}>
     <div class="govuk-width-container<#if (params.containerClasses)?has_content> ${(params.containerClasses)!}</#if>">
       <#if (params.navigation?size != 0) && (!params.navigation?size?is_nan)>
         <div class="govuk-footer__navigation">
@@ -12,7 +12,7 @@
                   <#list nav.items![] as item>
                     <#if (item.href)?has_content && (item.text)?has_content>
                       <li class="govuk-footer__list-item">
-                        <a class="govuk-footer__link" href="${item.href}"${attributes.govukAttributes(item.attributes)}>
+                        <a class="govuk-footer__link" href="${item.href}"${attributes.govukAttributes(((item.attributes)!{}))}>
                           ${(item.text)!}
                         </a>
                       </li>
@@ -33,7 +33,7 @@
           <ul class="govuk-footer__inline-list">
           <#list params.meta.items![] as item>
             <li class="govuk-footer__inline-list-item">
-              <a class="govuk-footer__link" href="${item.href}"${attributes.govukAttributes(item.attributes)}>
+              <a class="govuk-footer__link" href="${item.href}"${attributes.govukAttributes(((item.attributes)!{}))}>
                 ${(item.text)!}
               </a>
             </li>

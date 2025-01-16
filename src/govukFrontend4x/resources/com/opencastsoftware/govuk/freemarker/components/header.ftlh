@@ -1,5 +1,5 @@
 <#macro govukHeaderMacro params>
-  <#local menuButtonText=((params.menuButtonText)?has_content)?then(params.menuButtonText, "Menu")>
+  <#local menuButtonText=((params.menuButtonText)?has_content)?then((params.menuButtonText)!, "Menu")>
   
   <#local _stEdwardsCrown>
   <!--[if gt IE 8]><!-->
@@ -18,7 +18,7 @@
   </svg>
   <!--<![endif]-->
   <!--[if IE 8]>
-  <img src="${params.assetsPath!("/assets/images")}/govuk-logotype-crown.png" class="govuk-header__logotype-crown-fallback-image" width="36" height="32" alt="">
+  <img src="${(params.assetsPath)!("/assets/images")}/govuk-logotype-crown.png" class="govuk-header__logotype-crown-fallback-image" width="36" height="32" alt="">
   <![endif]-->
   </#local>
   
@@ -39,14 +39,14 @@
   </svg>
   <!--<![endif]-->
   <!--[if IE 8]>
-  <img src="${params.assetsPath!("/assets/images")}/govuk-logotype-tudor-crown.png" class="govuk-header__logotype-crown-fallback-image" width="32" height="30" alt="">
+  <img src="${(params.assetsPath)!("/assets/images")}/govuk-logotype-tudor-crown.png" class="govuk-header__logotype-crown-fallback-image" width="32" height="30" alt="">
   <![endif]-->
   </#local>
   
-  <header class="govuk-header ${((params.classes)?has_content)?then((params.classes)!, "")}" role="banner" data-module="govuk-header"<#list params.attributes!{} as attribute, value> ${(attribute)!}="${(value)!}"</#list>>
-    <div class="govuk-header__container ${params.containerClasses!("govuk-width-container")}">
+  <header class="govuk-header ${((params.classes)?has_content)?then((params.classes)!, "")}" role="banner" data-module="govuk-header"<#list params.attributes!{} as attribute, value> ${attribute}="${((value)!{})}"</#list>>
+    <div class="govuk-header__container ${(params.containerClasses)!("govuk-width-container")}">
       <div class="govuk-header__logo">
-        <a href="${params.homepageUrl!("/")}" class="govuk-header__link govuk-header__link--homepage">
+        <a href="${(params.homepageUrl)!("/")}" class="govuk-header__link govuk-header__link--homepage">
           <span class="govuk-header__logotype">
             ${(((params.useTudorCrown)?? && params.useTudorCrown)?then(_tudorCrown, _stEdwardsCrown))?no_esc}
             <span class="govuk-header__logotype-text">
@@ -74,15 +74,15 @@
       </#if>
       </#if>
       <#if (params.navigation)??>
-      <nav aria-label="${params.navigationLabel!(menuButtonText)}" class="govuk-header__navigation ${((params.navigationClasses)?has_content)?then((params.navigationClasses)!, "")}">
-        <button type="button" class="govuk-header__menu-button govuk-js-header-toggle" aria-controls="navigation" aria-label="${params.menuButtonLabel!("Show or hide menu")}" hidden>${(menuButtonText)!}</button>
+      <nav aria-label="${(params.navigationLabel)!(menuButtonText)}" class="govuk-header__navigation ${((params.navigationClasses)?has_content)?then((params.navigationClasses)!, "")}">
+        <button type="button" class="govuk-header__menu-button govuk-js-header-toggle" aria-controls="navigation" aria-label="${(params.menuButtonLabel)!("Show or hide menu")}" hidden>${(menuButtonText)!}</button>
   
         <ul id="navigation" class="govuk-header__navigation-list">
           <#list params.navigation![] as item>
             <#if (item.text)?has_content || (item.html)?has_content>
               <li class="govuk-header__navigation-item${((item.active)?? && item.active)?then(" govuk-header__navigation-item--active", "")}">
                 <#if (item.href)?has_content>
-                  <a class="govuk-header__link" href="${(item.href)!}"<#list item.attributes!{} as attribute, value> ${(attribute)!}="${(value)!}"</#list>>
+                  <a class="govuk-header__link" href="${(item.href)!}"<#list item.attributes!{} as attribute, value> ${attribute}="${((value)!{})}"</#list>>
                 </#if>
                   ${((item.html)?has_content)?then(item.html?no_esc, (item.text)!)}
                 <#if (item.href)?has_content>

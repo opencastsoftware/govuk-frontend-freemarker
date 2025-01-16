@@ -1,5 +1,5 @@
 <#macro govukTableMacro params>
-  <#import "../macros/attributes.ftlh" as attributes><table class="govuk-table<#if (params.classes)?has_content> ${(params.classes)!}</#if>"${attributes.govukAttributes(params.attributes)}>
+  <#import "../macros/attributes.ftlh" as attributes><table class="govuk-table<#if (params.classes)?has_content> ${(params.classes)!}</#if>"${attributes.govukAttributes(((params.attributes)!{}))}>
   <#if (params.caption)?has_content>
     <caption class="govuk-table__caption<#if (params.captionClasses)?has_content> ${(params.captionClasses)!}</#if>">${(params.caption)!}</caption>
   </#if>
@@ -7,7 +7,7 @@
     <thead class="govuk-table__head">
       <tr class="govuk-table__row">
       <#list params.head![] as item>
-        <th scope="col" class="govuk-table__header<#if (item.format)?has_content> govuk-table__header--${(item.format)!}</#if><#if (item.classes)?has_content> ${(item.classes)!}</#if>"<#if (item.colspan != 0) && (!item.colspan?is_nan)> colspan="${(item.colspan)!0}"</#if><#if (item.rowspan != 0) && (!item.rowspan?is_nan)> rowspan="${(item.rowspan)!0}"</#if>${attributes.govukAttributes(item.attributes)}>${((item.html)?has_content)?then(item.html?no_esc, (item.text)!)}</th>
+        <th scope="col" class="govuk-table__header<#if (item.format)?has_content> govuk-table__header--${(item.format)!}</#if><#if (item.classes)?has_content> ${(item.classes)!}</#if>"<#if (item.colspan != 0) && (!item.colspan?is_nan)> colspan="${((item.colspan)!0)}"</#if><#if (item.rowspan != 0) && (!item.rowspan?is_nan)> rowspan="${((item.rowspan)!0)}"</#if>${attributes.govukAttributes(((item.attributes)!{}))}>${((item.html)?has_content)?then(item.html?no_esc, (item.text)!)}</th>
       </#list>
       </tr>
     </thead>
@@ -17,7 +17,7 @@
     <#if (row)??>
       <tr class="govuk-table__row">
       <#list row as cell>
-        <#local commonAttributes><#if (cell.colspan != 0) && (!cell.colspan?is_nan)> colspan="${(cell.colspan)!0}"</#if><#if (cell.rowspan != 0) && (!cell.rowspan?is_nan)> rowspan="${(cell.rowspan)!0}"</#if>${attributes.govukAttributes(cell.attributes)}</#local>
+        <#local commonAttributes><#if (cell.colspan != 0) && (!cell.colspan?is_nan)> colspan="${((cell.colspan)!0)}"</#if><#if (cell.rowspan != 0) && (!cell.rowspan?is_nan)> rowspan="${((cell.rowspan)!0)}"</#if>${attributes.govukAttributes(((cell.attributes)!{}))}</#local>
         <#if cell?is_first && (params.firstCellIsHeader)?? && params.firstCellIsHeader>
         <th scope="row" class="govuk-table__header<#if (cell.classes)?has_content> ${(cell.classes)!}</#if>"${commonAttributes?no_esc}>${((cell.html)?has_content)?then(cell.html?no_esc, (cell.text)!)}</th>
         <#else>

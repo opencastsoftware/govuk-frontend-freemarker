@@ -1,11 +1,11 @@
 <#macro govukCookieBannerMacro params>
-  <#import "./button.ftlh" as button><div class="govuk-cookie-banner ${((params.classes)?has_content)?then((params.classes)!, "")}" data-nosnippet role="region" aria-label="${params.ariaLabel!("Cookie banner")}"<#if (params.hidden)?? && params.hidden> hidden</#if><#list params.attributes!{} as attribute, value> ${(attribute)!}="${(value)!}"</#list>><#list params.messages as message>
+  <#import "./button.ftlh" as button><div class="govuk-cookie-banner ${((params.classes)?has_content)?then((params.classes)!, "")}" data-nosnippet role="region" aria-label="${(params.ariaLabel)!("Cookie banner")}"<#if (params.hidden)?? && params.hidden> hidden</#if><#list params.attributes!{} as attribute, value> ${attribute}="${((value)!{})}"</#list>><#list params.messages as message>
       <#local classNames="govuk-cookie-banner__message govuk-width-container">
       <#if (message.classes)?has_content>
         <#local classNames=classNames + " " + message.classes>
       </#if>
   
-      <div class="${(classNames)!}"<#if (message.role)?has_content> role="${(message.role)!}"</#if><#list message.attributes!{} as attribute, value> ${(attribute)!}="${(value)!}"</#list><#if (message.hidden)?? && message.hidden> hidden</#if>>
+      <div class="${(classNames)!}"<#if (message.role)?has_content> role="${(message.role)!}"</#if><#list message.attributes!{} as attribute, value> ${attribute}="${((value)!{})}"</#list><#if (message.hidden)?? && message.hidden> hidden</#if>>
   
       <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
@@ -28,7 +28,7 @@
                 <#if (action.classes)?has_content>
                   <#local linkClasses=linkClasses + " " + action.classes>
                 </#if>
-                <a class="${(linkClasses)!}" href="${(action.href)!}"<#list action.attributes!{} as attribute, value> ${(attribute)!}="${(value)!}"</#list>>${(action.text)!}</a>
+                <a class="${(linkClasses)!}" href="${(action.href)!}"<#list action.attributes!{} as attribute, value> ${attribute}="${((value)!{})}"</#list>>${(action.text)!}</a>
               </#if>
             <#else>
               ${button.govukButton(((action.text)??)?then({ "text": action.text }, {}) + ((action.value)??)?then({ "value": action.value }, {}) + ((action.name)??)?then({ "name": action.name }, {}) + ((action.type)??)?then({ "type": action.type }, {}) + ((action.classes)??)?then({ "classes": action.classes }, {}) + ((action.attributes)??)?then({ "attributes": action.attributes }, {}))?markup_string?trim?no_esc}

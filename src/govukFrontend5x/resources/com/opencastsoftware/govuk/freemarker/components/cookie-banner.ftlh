@@ -1,8 +1,8 @@
 <#macro govukCookieBannerMacro params>
   <#import "../macros/attributes.ftlh" as attributes>
-  <#import "./button.ftlh" as button><div class="govuk-cookie-banner<#if (params.classes)?has_content> ${(params.classes)!}</#if>" data-nosnippet role="region" aria-label="${((params.ariaLabel)?has_content)?then(params.ariaLabel, "Cookie banner")}"<#if (params.hidden)?? && params.hidden> hidden</#if>${attributes.govukAttributes(params.attributes)}>
+  <#import "./button.ftlh" as button><div class="govuk-cookie-banner<#if (params.classes)?has_content> ${(params.classes)!}</#if>" data-nosnippet role="region" aria-label="${((params.ariaLabel)?has_content)?then(params.ariaLabel, "Cookie banner")}"<#if (params.hidden)?? && params.hidden> hidden</#if>${attributes.govukAttributes(((params.attributes)!{}))}>
     <#list params.messages as message>
-    <div class="govuk-cookie-banner__message<#if (message.classes)?has_content> ${(message.classes)!}</#if> govuk-width-container"<#if (message.role)?has_content> role="${(message.role)!}"</#if>${attributes.govukAttributes(message.attributes)}<#if (message.hidden)?? && message.hidden> hidden</#if>>
+    <div class="govuk-cookie-banner__message<#if (message.classes)?has_content> ${(message.classes)!}</#if> govuk-width-container"<#if (message.role)?has_content> role="${(message.role)!}"</#if>${attributes.govukAttributes(((message.attributes)!{}))}<#if (message.hidden)?? && message.hidden> hidden</#if>>
   
       <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
@@ -26,9 +26,9 @@
       <#list message.actions![] as action>
         <#local buttonHtml>
           <#if !((action.href)?has_content) || (action.type)! == "button">
-            ${button.govukButton({ "type": ((action.type)?has_content)?then(action.type, "button") } + ((action.text)??)?then({ "text": action.text }, {}) + ((action.name)??)?then({ "name": action.name }, {}) + ((action.value)??)?then({ "value": action.value }, {}) + ((action.classes)??)?then({ "classes": action.classes }, {}) + ((action.href)??)?then({ "href": action.href }, {}) + ((action.attributes)??)?then({ "attributes": action.attributes }, {}))}
+            ${button.govukButton(((action.text)??)?then({ "text": action.text }, {}) + ((action.type)?has_content)?then((action.type??)?then({ "type": action.type }, {}), { "type": "button" }) + ((action.name)??)?then({ "name": action.name }, {}) + ((action.value)??)?then({ "value": action.value }, {}) + ((action.classes)??)?then({ "classes": action.classes }, {}) + ((action.href)??)?then({ "href": action.href }, {}) + ((action.attributes)??)?then({ "attributes": action.attributes }, {}))}
           <#else>
-            <a class="govuk-link<#if (action.classes)?has_content> ${(action.classes)!}</#if>" href="${(action.href)!}"${attributes.govukAttributes(action.attributes)}>${(action.text)!}</a>
+            <a class="govuk-link<#if (action.classes)?has_content> ${(action.classes)!}</#if>" href="${(action.href)!}"${attributes.govukAttributes(((action.attributes)!{}))}>${(action.text)!}</a>
           </#if></#local>
         ${buttonHtml?markup_string?trim?no_esc}
       </#list>

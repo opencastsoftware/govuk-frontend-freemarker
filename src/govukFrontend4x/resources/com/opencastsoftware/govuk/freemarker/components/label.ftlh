@@ -1,7 +1,7 @@
 <#macro govukLabelMacro params>
   <#if (params.html)?has_content || (params.text)?has_content>
   <#local labelHtml>
-  <label class="govuk-label<#if (params.classes)?has_content> ${(params.classes)!}</#if>"<#list params.attributes!{} as attribute, value> ${(attribute)!}="${(value)!}"</#list><#if (params.for)?has_content> for="${(params.for)!}"</#if>>
+  <label class="govuk-label<#if (params.classes)?has_content> ${(params.classes)!}</#if>"<#list params.attributes!{} as attribute, value> ${attribute}="${((value)!{})}"</#list><#if (params.for)?has_content> for="${(params.for)!}"</#if>>
     ${((params.html)?has_content)?then(params.html?no_esc, (params.text)!)}
   </label>
   </#local>

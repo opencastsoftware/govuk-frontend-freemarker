@@ -1,6 +1,6 @@
 <#macro govukErrorSummaryMacro params>
   <#local caller><#nested/></#local>
-  <#import "../macros/attributes.ftlh" as attributes><div class="govuk-error-summary<#if (params.classes)?has_content> ${(params.classes)!}</#if>"<#if (params.disableAutoFocus)??> data-disable-auto-focus="${(params.disableAutoFocus)!false}"</#if>${attributes.govukAttributes(params.attributes)} data-module="govuk-error-summary">
+  <#import "../macros/attributes.ftlh" as attributes><div class="govuk-error-summary<#if (params.classes)?has_content> ${(params.classes)!}</#if>"<#if (params.disableAutoFocus)??> data-disable-auto-focus="${((params.disableAutoFocus)!false)}"</#if>${attributes.govukAttributes(((params.attributes)!{}))} data-module="govuk-error-summary">
     <div role="alert">
       <h2 class="govuk-error-summary__title">
         ${((params.titleHtml)?has_content)?then(params.titleHtml?no_esc?markup_string?trim?no_esc, (params.titleText)!)}
@@ -16,7 +16,7 @@
           <#list params.errorList![] as item>
             <li>
             <#if (item.href)?has_content>
-              <a href="${(item.href)!}"${attributes.govukAttributes(item.attributes)}>${((item.html)?has_content)?then(item.html?no_esc?markup_string?trim?no_esc, (item.text)!)}</a>
+              <a href="${(item.href)!}"${attributes.govukAttributes(((item.attributes)!{}))}>${((item.html)?has_content)?then(item.html?no_esc?markup_string?trim?no_esc, (item.text)!)}</a>
             <#else>
               ${((item.html)?has_content)?then(item.html?no_esc?markup_string?trim?no_esc, (item.text)!)}
             </#if>

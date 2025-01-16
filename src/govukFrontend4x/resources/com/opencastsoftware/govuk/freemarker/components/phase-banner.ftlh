@@ -1,5 +1,5 @@
 <#macro govukPhaseBannerMacro params>
-  <#import "./tag.ftlh" as tag><div class="govuk-phase-banner<#if (params.classes)?has_content> ${(params.classes)!}</#if>"<#list params.attributes!{} as attribute, value> ${(attribute)!}="${(value)!}"</#list>>
+  <#import "./tag.ftlh" as tag><div class="govuk-phase-banner<#if (params.classes)?has_content> ${(params.classes)!}</#if>"<#list params.attributes!{} as attribute, value> ${attribute}="${((value)!{})}"</#list>>
     <p class="govuk-phase-banner__content">
       ${tag.govukTag({ "classes": "govuk-phase-banner__content__tag" + (((params.tag.classes)?has_content)?then(" " + params.tag.classes, "")) } + ((params.tag.text)??)?then({ "text": params.tag.text }, {}) + ((params.tag.html)??)?then({ "html": params.tag.html }, {}))?markup_string?trim?no_esc}
       <span class="govuk-phase-banner__text">

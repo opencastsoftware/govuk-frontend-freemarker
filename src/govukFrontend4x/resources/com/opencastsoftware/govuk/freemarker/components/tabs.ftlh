@@ -1,7 +1,7 @@
 <#macro govukTabsMacro params>
-  <#local idPrefix=((params.idPrefix)?has_content)?then(params.idPrefix, "")><div<#if (params.id)?has_content> id="${(params.id)!}"</#if> class="govuk-tabs<#if (params.classes)?has_content> ${(params.classes)!}</#if>"<#list params.attributes!{} as attribute, value> ${(attribute)!}="${(value)!}"</#list> data-module="govuk-tabs">
+  <#local idPrefix=((params.idPrefix)?has_content)?then((params.idPrefix)!, "")><div<#if (params.id)?has_content> id="${(params.id)!}"</#if> class="govuk-tabs<#if (params.classes)?has_content> ${(params.classes)!}</#if>"<#list params.attributes!{} as attribute, value> ${attribute}="${((value)!{})}"</#list> data-module="govuk-tabs">
     <h2 class="govuk-tabs__title">
-      ${params.title!("Contents")}
+      ${(params.title)!("Contents")}
     </h2>
     <#if ((params.items?size != 0) && (!params.items?size?is_nan))>
     <ul class="govuk-tabs__list">
@@ -9,7 +9,7 @@
         <#if (item)??>
           <#local id=((item.id)?has_content)?then(item.id, idPrefix + "-" + item?counter)>
           <li class="govuk-tabs__list-item<#if item?counter == 1> govuk-tabs__list-item--selected</#if>">
-            <a class="govuk-tabs__tab" href="#${(id)!}"<#list item.attributes!{} as attribute, value> ${(attribute)!}="${(value)!}"</#list>>
+            <a class="govuk-tabs__tab" href="#${(id)!}"<#list item.attributes!{} as attribute, value> ${attribute}="${((value)!{})}"</#list>>
               ${item.label}
             </a>
           </li>
@@ -20,7 +20,7 @@
     <#list params.items as item>
       <#if (item)??>
         <#local id=((item.id)?has_content)?then(item.id, idPrefix + "-" + item?counter)>
-        <div class="govuk-tabs__panel<#if item?counter gt 1> govuk-tabs__panel--hidden</#if>" id="${(id)!}"<#list item.panel.attributes!{} as attribute, value> ${(attribute)!}="${(value)!}"</#list>>
+        <div class="govuk-tabs__panel<#if item?counter gt 1> govuk-tabs__panel--hidden</#if>" id="${(id)!}"<#list item.panel.attributes!{} as attribute, value> ${attribute}="${((value)!{})}"</#list>>
           <#if (item.panel.html)?has_content>
             ${item.panel.html?no_esc}
           <#elseif (item.panel.text)?has_content>

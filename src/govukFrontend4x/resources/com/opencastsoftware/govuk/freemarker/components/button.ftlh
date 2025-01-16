@@ -19,7 +19,7 @@
   </svg>
     </#local>
     <#local classNames=classNames + " govuk-button--start">
-  </#if><#local commonAttributes> class="${(classNames)!}" data-module="govuk-button"<#list params.attributes!{} as attribute, value> ${(attribute)!}="${(value)!}"</#list><#if (params.id)?has_content> id="${(params.id)!}"</#if></#local><#local buttonAttributes><#if (params.name)?has_content> name="${(params.name)!}"</#if><#if (params.disabled)?? && params.disabled> disabled="disabled" aria-disabled="true"</#if><#if (params.preventDoubleClick)??> data-prevent-double-click="${(params.preventDoubleClick)!false}"</#if></#local><#if (element)! == "a">
+  </#if><#local commonAttributes> class="${(classNames)!}" data-module="govuk-button"<#list params.attributes!{} as attribute, value> ${attribute}="${((value)!{})}"</#list><#if (params.id)?has_content> id="${(params.id)!}"</#if></#local><#local buttonAttributes><#if (params.name)?has_content> name="${(params.name)!}"</#if><#if (params.disabled)?? && params.disabled> disabled="disabled" aria-disabled="true"</#if><#if (params.preventDoubleClick)??> data-prevent-double-click="${((params.preventDoubleClick)!false)}"</#if></#local><#if (element)! == "a">
   <a href="${((params.href)?has_content)?then((params.href)!, "#")}" role="button" draggable="false"${commonAttributes?no_esc}>
     ${((params.html)?has_content)?then(params.html?no_esc, (params.text)!)}
   ${((iconHtml)?has_content)?then(iconHtml?markup_string?trim?no_esc, "")}</a><#elseif (element)! == "button">
