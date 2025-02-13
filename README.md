@@ -52,6 +52,15 @@ Maven (pom.xml):
 </dependency>
 ```
 
+## Conformance Testing
+
+These components are A/B tested versus the original Nunjucks components using [govuk-nunjucks-renderer](https://github.com/opencastsoftware/govuk-nunjucks-renderer) to ensure that the translated components produce identical output for randomly generated inputs.
+
+The allowed parameters for each component are determined based on the .yaml files in the component folders in GOV.UK Frontend. In general the coverage of these parameters is very good with a couple of exceptions:
+
+* The property-based testing framework that we use makes it difficult to implement mutually exclusive properties, so in components which have `*Text` and `*Html` properties, we may test scenarios that shouldn't happen in reality, such as neither property being set when at least one is mandatory.
+* We imply that parameters of type `object` but with no documented `params` are of Java type `Map<String, String>`. This won't cover the full range of possibilities for a HTML attributes property, which should probably be `Map<String, Object>`.
+
 ## Known Issues
 
 There are no known functional issues with these translated templates. If you find some, please report them on the Issues tab!
