@@ -2,6 +2,7 @@
 
 [![CI](https://github.com/opencastsoftware/govuk-frontend-freemarker/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/opencastsoftware/govuk-frontend-freemarker/actions/workflows/ci.yml)
 [![Maven Central](https://img.shields.io/maven-central/v/com.opencastsoftware/govuk-frontend-freemarker)](https://search.maven.org/search?q=g%3Acom.opencastsoftware+AND+a%3Agovuk-frontend-freemarker)
+![JDK Support](https://img.shields.io/badge/dynamic/regex?url=https%3A%2F%2Fraw.githubusercontent.com%2Fopencastsoftware%2Fgovuk-frontend-freemarker%2Frefs%2Fheads%2Fmain%2Fbuild.gradle.kts&search=options%5C.release%5C.set%5C((.%2B)%5C)&replace=%241%2B&logo=openjdk&label=JDK)
 [![License](https://img.shields.io/badge/license-MIT-blue)](https://spdx.org/licenses/MIT.html)
 
 This repository contains [Apache FreeMarker](https://freemarker.apache.org/) templates for the [GOV.UK Design System](https://design-system.service.gov.uk/) components.
