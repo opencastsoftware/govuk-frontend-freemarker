@@ -60,7 +60,7 @@ public abstract class ComponentTest<A> {
     public ComponentTest(String componentName) throws IOException, ParserConfigurationException {
         this.componentName = componentName;
         this.config = templateConfiguration();
-        this.objectMapper.setSerializationInclusion(Include.NON_NULL);
+        this.objectMapper.setDefaultPropertyInclusion(Include.NON_NULL);
         var stringTemplateLoader = new StringTemplateLoader();
         var classTemplateLoader = new ClassTemplateLoader(Params.class, "");
         config.setTemplateLoader(new MultiTemplateLoader(new TemplateLoader[]{stringTemplateLoader, classTemplateLoader}));

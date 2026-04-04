@@ -1,8 +1,6 @@
 <#macro govukFooterMacro params>
-  <#import "../macros/attributes.ftlh" as attributes><#import "../macros/logo.ftlh" as logo><#local _rebrand=(params.rebrand)!(((govukRebrand)?is_method)?then(govukRebrand(), govukRebrand))><footer class="govuk-footer<#if (params.classes)?has_content> ${(params.classes)!}</#if>"${attributes.govukAttributes(((params.attributes)!{}))}>
-    <div class="govuk-width-container<#if (params.containerClasses)?has_content> ${(params.containerClasses)!}</#if>">
-      <#if (_rebrand)?? && _rebrand>${logo.govukLogo({ "classes": "govuk-footer__crown", "rebrand": true, "useLogotype": false })}
-      </#if>
+  <#import "../macros/attributes.ftlh" as attributes><#import "../macros/logo.ftlh" as logo><div class="govuk-footer<#if (params.classes)?has_content> ${(params.classes)!}</#if>"${attributes.govukAttributes(((params.attributes)!{}))}>
+    <div class="govuk-width-container<#if (params.containerClasses)?has_content> ${(params.containerClasses)!}</#if>">${logo.govukLogo({ "classes": "govuk-footer__crown", "useLogotype": false })}
       <#if (params.navigation?size != 0) && (!params.navigation?size?is_nan)>
         <div class="govuk-footer__navigation">
           <#list params.navigation![] as nav>
@@ -91,7 +89,7 @@
         </div>
       </div>
     </div>
-  </footer>
+  </div>
   
 </#macro>
 

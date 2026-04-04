@@ -61,7 +61,7 @@ testing {
     }
 }
 
-val govukFrontendVersions = mapOf("govukFrontend4x" to "v4.9.0", "govukFrontend5x" to "v5.8.0")
+val govukFrontendVersions = mapOf("govukFrontend5x" to "v5.14.0", "govukFrontend6x" to "v6.1.0")
 val isCI = !System.getenv("CI").isNullOrEmpty()
 
 govukFrontendVersions.forEach { (version, tagName) ->

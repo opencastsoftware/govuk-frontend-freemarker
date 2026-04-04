@@ -14,12 +14,31 @@ At present this repository is tracking the last two major versions of the [GOV.U
 
 A [Maven classifier](https://maven.apache.org/pom.html#Dependencies) is used to select the GOV.UK Frontend major version.
 
+### GOV.UK Frontend 6.x
+
+Gradle (build.gradle / build.gradle.kts):
+
+```kotlin
+implementation("com.opencastsoftware:govuk-frontend-freemarker:0.1.3:govuk-frontend6x")
+```
+
+Maven (pom.xml):
+
+```
+<dependency>
+    <groupId>com.opencastsoftware</groupId>
+    <artifactId>govuk-frontend-freemarker</artifactId>
+    <version>0.1.3</version>
+    <classifier>govuk-frontend6x</classifier>
+</dependency>
+```
+
 ### GOV.UK Frontend 5.x
 
 Gradle (build.gradle / build.gradle.kts):
 
 ```kotlin
-implementation("com.opencastsoftware:govuk-frontend-freemarker:0.1.2:govuk-frontend5x")
+implementation("com.opencastsoftware:govuk-frontend-freemarker:0.1.3:govuk-frontend5x")
 ```
 
 Maven (pom.xml):
@@ -28,27 +47,8 @@ Maven (pom.xml):
 <dependency>
     <groupId>com.opencastsoftware</groupId>
     <artifactId>govuk-frontend-freemarker</artifactId>
-    <version>0.1.2</version>
+    <version>0.1.3</version>
     <classifier>govuk-frontend5x</classifier>
-</dependency>
-```
-
-### GOV.UK Frontend 4.x
-
-Gradle (build.gradle / build.gradle.kts):
-
-```kotlin
-implementation("com.opencastsoftware:govuk-frontend-freemarker:0.1.2:govuk-frontend4x")
-```
-
-Maven (pom.xml):
-
-```
-<dependency>
-    <groupId>com.opencastsoftware</groupId>
-    <artifactId>govuk-frontend-freemarker</artifactId>
-    <version>0.1.2</version>
-    <classifier>govuk-frontend4x</classifier>
 </dependency>
 ```
 
