@@ -18,7 +18,7 @@ log4j = "2.0.18"
 logback = "1.5.34"
 snakeYaml = "2.6"
 toStringVerifier = "1.4.8"
-xmlUnit = "2.11.0"
+xmlUnit = "2.12.0"
 
 [libraries]
 apacheCommonsLang = { module = "org.apache.commons:commons-lang3", version.ref = "apacheCommonsLang" }
